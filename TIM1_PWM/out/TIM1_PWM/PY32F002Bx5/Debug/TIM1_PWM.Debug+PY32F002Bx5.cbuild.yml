@@ -1,0 +1,135 @@
+build:
+  generated-by: csolution version 2.13.0+p3-g40b6564e
+  solution: ../../../../TIM1_PWM.csolution.yml
+  project: ../../../../TIM1_PWM/TIM1_PWM.cproject.yml
+  context: TIM1_PWM.Debug+PY32F002Bx5
+  compiler: AC6
+  device: Puya::PY32F002Bx5
+  device-pack: Puya::PY32F0xx_DFP@1.2.8
+  dbgconf:
+    - file: ../../../../.cmsis/TIM1_PWM+PY32F002Bx5.dbgconf
+      version: 0.0.0
+  processor:
+    endian: little
+    fpu: off
+    core: Cortex-M0+
+  packs:
+    - pack: ARM::CMSIS@6.3.0
+      path: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0
+    - pack: Puya::PY32F0xx_DFP@1.2.8
+      path: ${CMSIS_PACK_ROOT}/Puya/PY32F0xx_DFP/1.2.8
+  optimize: none
+  debug: on
+  misc:
+    ASM:
+      - -gdwarf-5
+      - -masm=auto
+    C:
+      - -gdwarf-5
+      - -std=gnu11
+      - -Wno-macro-redefined
+      - -Wno-pragma-pack
+      - -Wno-parentheses-equality
+      - -Wno-license-management
+    CPP:
+      - -gdwarf-5
+      - -Wno-macro-redefined
+      - -Wno-pragma-pack
+      - -Wno-parentheses-equality
+      - -Wno-license-management
+    Link:
+      - --entry=Reset_Handler
+      - --info=summarysizes
+      - --summary_stderr
+      - --diag_suppress=L6314W
+  define:
+    - _RTE_
+  define-asm:
+    - _RTE_
+  add-path:
+    - ../../../../TIM1_PWM/RTE/_Debug_PY32F002Bx5
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+    - ${CMSIS_PACK_ROOT}/Puya/PY32F0xx_DFP/1.2.8/Drivers/CMSIS/Device/PY32F0xx/Include
+  add-path-asm:
+    - ../../../../TIM1_PWM/RTE/_Debug_PY32F002Bx5
+    - ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+    - ${CMSIS_PACK_ROOT}/Puya/PY32F0xx_DFP/1.2.8/Drivers/CMSIS/Device/PY32F0xx/Include
+  output-dirs:
+    intdir: ../../../../tmp
+    outdir: .
+    rtedir: ../../../../TIM1_PWM/RTE
+  output:
+    - type: elf
+      file: TIM1_PWM.axf
+    - type: hex
+      file: TIM1_PWM.hex
+    - type: map
+      file: TIM1_PWM.axf.map
+    - type: comp-db
+      file: compile_commands.json
+  components:
+    - component: ARM::CMSIS:CORE@6.2.0
+      condition: ARMv6_7_8-M Device
+      from-pack: ARM::CMSIS@6.3.0
+      selected-by: ARM::CMSIS:CORE
+      files:
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include
+          category: include
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Include/tz_context.h
+          category: header
+          version: 6.2.0
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/main_s.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: Secure mode 'main' module for ARMv8-M
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Core/Template/ARMv8-M/tz_context.c
+          category: sourceC
+          attr: template
+          version: 1.1.1
+          select: RTOS Context Management (TrustZone for ARMv8-M)
+        - file: ${CMSIS_PACK_ROOT}/ARM/CMSIS/6.3.0/CMSIS/Documentation/html/Core/index.html
+          category: doc
+          version: 6.2.0
+    - component: Puya::Device:Startup@1.0.0
+      condition: PY32F0 CMSIS
+      from-pack: Puya::PY32F0xx_DFP@1.2.8
+      selected-by: Device:Startup
+      files:
+        - file: ${CMSIS_PACK_ROOT}/Puya/PY32F0xx_DFP/1.2.8/Drivers/CMSIS/Device/PY32F0xx/Include
+          category: include
+          version: 1.0.0
+        - file: ${CMSIS_PACK_ROOT}/Puya/PY32F0xx_DFP/1.2.8/Drivers/CMSIS/Device/PY32F0xx/Include/py32f0xx.h
+          category: header
+          version: 1.0.0
+        - file: ../../../../TIM1_PWM/RTE/Device/PY32F002Bx5/startup_py32f002bxx.s
+          category: source
+          attr: config
+          version: 1.0.0
+        - file: ../../../../TIM1_PWM/RTE/Device/PY32F002Bx5/system_py32f002b.c
+          category: source
+          attr: config
+          version: 1.0.0
+  linker:
+    script: ../../../../TIM1_PWM/RTE/Device/PY32F002Bx5/ac6_linker_script.sct.src
+    regions: ../../../../TIM1_PWM/RTE/Device/PY32F002Bx5/regions_PY32F002Bx5.h
+  groups:
+    - group: Source Files
+      files:
+        - file: ../../../../TIM1_PWM/main.cpp
+          category: sourceCpp
+  constructed-files:
+    - file: ../../../../TIM1_PWM/RTE/_Debug_PY32F002Bx5/RTE_Components.h
+      category: header
+  licenses:
+    - license: <unknown>
+      packs:
+        - pack: Puya::PY32F0xx_DFP@1.2.8
+      components:
+        - component: Puya::Device:Startup@1.0.0
+    - license: Apache-2.0
+      packs:
+        - pack: ARM::CMSIS@6.3.0
+      components:
+        - component: ARM::CMSIS:CORE@6.2.0

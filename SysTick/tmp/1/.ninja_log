@@ -1,0 +1,21 @@
+# ninja log v7
+11	220	1775387667279417793	CMakeFiles/Puya_Device_Startup_1_0_0.dir/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/SysTick/RTE/Device/PY32F002Bx5/system_py32f002b.o	1a118e8640312570
+7	245	1775387667275417784	CMakeFiles/Puya_Device_Startup_1_0_0.dir/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/SysTick/RTE/Device/PY32F002Bx5/startup_py32f002bxx.o	8ca0e3f795d7e744
+3	413	1775387667273417779	CMakeFiles/Group_Source_Files.dir/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/SysTick/main.o	4032f6b80b13c427
+413	786	1775387667992419437	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/out/SysTick/PY32F002Bx5/Debug/SysTick.axf	3d27d25c2eb7f771
+413	786	1775387667992419437	ac6_linker_script.sct	3d27d25c2eb7f771
+413	786	1775387667992419437	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/ac6_linker_script.sct	3d27d25c2eb7f771
+13	32	1775387668152419806	CMakeFiles/database	29f92b0fa1b89bd3
+13	32	1775387668152419806	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/CMakeFiles/database	29f92b0fa1b89bd3
+7	22	1775394692224453892	CMakeFiles/database	29f92b0fa1b89bd3
+7	22	1775394692224453892	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/CMakeFiles/database	29f92b0fa1b89bd3
+4	255	1775394722058118199	CMakeFiles/Group_Source_Files.dir/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/SysTick/main.o	4032f6b80b13c427
+255	758	1775394722784110191	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/out/SysTick/PY32F002Bx5/Debug/SysTick.axf	3d27d25c2eb7f771
+255	758	1775394722784110191	ac6_linker_script.sct	3d27d25c2eb7f771
+255	758	1775394722784110191	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/ac6_linker_script.sct	3d27d25c2eb7f771
+10	55	1775394722888109044	CMakeFiles/database	29f92b0fa1b89bd3
+10	55	1775394722888109044	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/CMakeFiles/database	29f92b0fa1b89bd3
+9	26	1775486799645674838	CMakeFiles/database	29f92b0fa1b89bd3
+9	26	1775486799645674838	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/CMakeFiles/database	29f92b0fa1b89bd3
+3	22	1775486834807076972	CMakeFiles/database	29f92b0fa1b89bd3
+3	22	1775486834807076972	/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/tmp/1/CMakeFiles/database	29f92b0fa1b89bd3

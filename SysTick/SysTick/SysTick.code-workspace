@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../CLOCK_SOURCE"
+		}
+	],
+	"settings": {
+		"clangd.arguments": [],
+		"debug.hideSlowPreLaunchWarning": true,
+		"debug.showInStatusBar": "never"
+	}
+}

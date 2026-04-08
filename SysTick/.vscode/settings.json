@@ -1,0 +1,7 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=/home/kfujii/ドキュメント/KeilStudio/PY32F002B/SysTick/out/SysTick/PY32F002Bx5/Debug"
+    ],
+    "debug.hideSlowPreLaunchWarning": true,
+    "debug.showInStatusBar": "never"
+}

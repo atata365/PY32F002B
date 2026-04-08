@@ -1,0 +1,17 @@
+-- The CXX compiler identification is ARMClang 6.24.0
+-- The ASM compiler identification is ARMClang
+-- Found assembler: /home/kfujii/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang
+-- The C compiler identification is ARMClang 6.24.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /home/kfujii/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /home/kfujii/.vcpkg/artifacts/2139c4c6/compilers.arm.armclang/6.24.0/bin/armclang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done (1.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/kfujii/ドキュメント/KeilStudio/PY32F002B/SMOOTH_BLINK_LED/tmp/1

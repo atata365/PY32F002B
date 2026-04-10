@@ -1,4 +1,5 @@
 TIM1_PWM/RTE/**
+TIM1_PWM/.clangd
 out/**
 tmp/**
 .vscode/**

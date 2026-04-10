@@ -1,0 +1,7 @@
+TIM14_INTERRUPT/RTE/**
+out/**
+tmp/**
+.vscode/**
+*.yml
+*.json
+*.code-workspace

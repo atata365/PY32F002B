@@ -1,5 +1,5 @@
-SMOOTH_BLINK_LED/RTE/**
-SMOOTH_BLINK_LED/.clangd
+*/RTE/**
+*/.clangd
 out/**
 tmp/**
 .vscode/**

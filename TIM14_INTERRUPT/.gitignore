@@ -1,5 +1,5 @@
-TIM14_INTERRUPT/RTE/**
-TIM14_INTERRUPT/.clangd
+*/RTE/**
+*/.clangd
 out/**
 tmp/**
 .vscode/**

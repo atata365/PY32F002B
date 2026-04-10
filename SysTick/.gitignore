@@ -1,5 +1,5 @@
-SysTick/RTE/**
-SysTick/.clangd
+*/RTE/**
+*/.clangd
 out/**
 tmp/**
 .vscode/**

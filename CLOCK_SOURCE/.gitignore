@@ -1,5 +1,5 @@
-CLOCK_SOURCE/RTE/**
-CLOCK_SOURCE/.clangd
+*/RTE/**
+*/.clangd
 out/**
 tmp/**
 .vscode/**

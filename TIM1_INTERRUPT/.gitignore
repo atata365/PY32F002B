@@ -1,7 +1,6 @@
 TIM1_INTERRUPT/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

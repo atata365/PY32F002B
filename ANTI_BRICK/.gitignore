@@ -1,7 +1,8 @@
+ANTI_BRICK/RTE/**
 out/**
 tmp/**
 RTE/**
-ANTI_BRICK/RTE/**
+.vscode/**
 *.yml
 *.json
 *.code-workspace

@@ -1,7 +1,6 @@
-SysTick/RTE/**
+CLOCK_SOURCE/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

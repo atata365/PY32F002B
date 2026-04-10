@@ -1,7 +1,6 @@
 ANTI_BRICK/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

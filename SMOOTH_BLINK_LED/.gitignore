@@ -1,7 +1,6 @@
-SMOOTH_BLINK/RTE/**
+SMOOTH_BLINK_LED/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

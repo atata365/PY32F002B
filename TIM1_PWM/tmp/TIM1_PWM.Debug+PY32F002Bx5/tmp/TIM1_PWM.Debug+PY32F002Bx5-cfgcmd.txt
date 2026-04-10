@@ -1,1 +1,0 @@
-cmd='/home/kfujii/.vcpkg/artifacts/2139c4c6/tools.kitware.cmake/3.31.5/bin/cmake;-G;Ninja;-S;<SOURCE_DIR>;-B;<BINARY_DIR>;-DSOLUTION_ROOT=/home/kfujii/ドキュメント/KeilStudio/PY32F002B/TIM1_PWM;-DCMSIS_PACK_ROOT=/home/kfujii/.cache/arm/packs;-DCMSIS_COMPILER_ROOT=/home/kfujii/.vscode/extensions/arm.cmsis-csolution-1.66.0-linux-x64/tools/cmsis-toolbox/etc'

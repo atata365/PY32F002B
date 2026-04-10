@@ -1,7 +1,6 @@
 TIM1_PWM/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

@@ -1,5 +1,5 @@
-ANTI_BRICK/RTE/**
-ANTI_BRICK/.clangd
+*/RTE/**
+*/.clangd
 out/**
 tmp/**
 .vscode/**

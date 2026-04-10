@@ -1,3 +1,7 @@
 out/**
 tmp/**
-
+RTE/**
+ANTI_BRICK/RTE/**
+*.yml
+*.json
+*.code-workspace

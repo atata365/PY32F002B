@@ -1,7 +1,6 @@
 SysTick/RTE/**
 out/**
 tmp/**
-RTE/**
 .vscode/**
 *.yml
 *.json

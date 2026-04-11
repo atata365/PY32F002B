@@ -4,5 +4,6 @@ out/**
 tmp/**
 .cmsis
 .vscode
+*.yml
 */*.yml
 *.json

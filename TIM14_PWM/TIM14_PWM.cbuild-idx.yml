@@ -1,0 +1,17 @@
+build-idx:
+  generated-by: csolution version 2.13.0+p3-g40b6564e
+  cdefault: ${CMSIS_COMPILER_ROOT}/cdefault.yml
+  csolution: TIM14_PWM.csolution.yml
+  cbuild-run: out/TIM14_PWM+PY32F002Bx5.cbuild-run.yml
+  tmpdir: tmp
+  cprojects:
+    - cproject: TIM14_PWM/TIM14_PWM.cproject.yml
+  cbuilds:
+    - cbuild: out/TIM14_PWM/PY32F002Bx5/Debug/TIM14_PWM.Debug+PY32F002Bx5.cbuild.yml
+      project: TIM14_PWM
+      configuration: .Debug+PY32F002Bx5
+      messages:
+        info:
+          - TIM14_PWM.cbuild-pack.yml - file is already up-to-date
+          - TIM14_PWM+PY32F002Bx5.cbuild-run.yml - file is already up-to-date
+          - TIM14_PWM.Debug+PY32F002Bx5.cbuild.yml - file is already up-to-date

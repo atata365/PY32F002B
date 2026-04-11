@@ -3,6 +3,4 @@
 out/**
 tmp/**
 .vscode/**
-*.yml
-*.json
 *.code-workspace

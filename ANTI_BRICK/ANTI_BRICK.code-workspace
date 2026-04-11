@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../CLOCK_SOURCE"
+		},
+		{
+			"path": "../SMOOTH_BLINK_LED"
+		},
+		{
+			"path": "../SysTick"
+		},
+		{
+			"path": "../TIM1_INTERRUPT"
+		},
+		{
+			"path": "../TIM1_PWM"
+		},
+		{
+			"path": "../TIM14_INTERRUPT"
+		}
+	],
+	"settings": {
+		"debug.hideSlowPreLaunchWarning": true,
+		"debug.showInStatusBar": "never"
+	}
+}

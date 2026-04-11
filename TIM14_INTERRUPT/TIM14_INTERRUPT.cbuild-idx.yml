@@ -13,5 +13,5 @@ build-idx:
       messages:
         info:
           - TIM14_INTERRUPT.cbuild-pack.yml - file is already up-to-date
-          - TIM14_INTERRUPT+PY32F002Bx5.cbuild-run.yml - file is already up-to-date
-          - TIM14_INTERRUPT.Debug+PY32F002Bx5.cbuild.yml - file is already up-to-date
+          - TIM14_INTERRUPT+PY32F002Bx5.cbuild-run.yml - file generated successfully
+          - TIM14_INTERRUPT.Debug+PY32F002Bx5.cbuild.yml - file generated successfully

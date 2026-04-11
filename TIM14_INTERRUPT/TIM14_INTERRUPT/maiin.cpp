@@ -32,7 +32,7 @@ void TIM14init() {
     /* 5kHz/5000=1Hz */
     TIM14->ARR = TIM_ARR_ARR_Msk & 4999;
     /* CCR1 = 0..65535(16bit) */ 
-    TIM14->CCR1 = 49;// duty 1%
+    TIM14->CCR1 = 2499;// duty 50%
     /* set PWM mode */
     /* PWM mode 1 , activate preload*/
     TIM14->CCMR1 = (TIM14->CCMR1 & ~TIM_CCMR1_OC1M)

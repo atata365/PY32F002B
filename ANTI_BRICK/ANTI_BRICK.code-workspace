@@ -20,10 +20,16 @@
 		},
 		{
 			"path": "../TIM14_INTERRUPT"
+		},
+		{
+			"path": "../TIM14_PWM"
 		}
 	],
 	"settings": {
 		"debug.hideSlowPreLaunchWarning": true,
-		"debug.showInStatusBar": "never"
+		"debug.showInStatusBar": "never",
+		"clangd.arguments": [
+			"--compile-commands-dir=c:\\Users\\kfuji\\KeilStudio\\PY32F002B\\TIM14_INTERRUPT\\out\\TIM14_INTERRUPT\\PY32F002Bx5\\Debug"
+		]
 	}
 }

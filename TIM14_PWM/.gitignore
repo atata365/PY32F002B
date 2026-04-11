@@ -1,3 +1,8 @@
 */.clangd
+*/RTE/**
 out/**
 tmp/**
+.cmsis
+.vscode
+*/*.yml
+*.json

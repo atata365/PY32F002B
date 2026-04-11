@@ -1,8 +1,0 @@
-{
-    "clangd.arguments": [
-        "--compile-commands-dir=/home/kfujii/ドキュメント/KeilStudio/PY32F002B/CLOCK_SOURCE/out/CLOCK_SOURCE/PY32F002Bx5/Debug"
-    ],
-    "debug.hideSlowPreLaunchWarning": true,
-    "debug.showInStatusBar": "never",
-    "cmsis-csolution.autoDebugLaunch": true
-}

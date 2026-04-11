@@ -1,4 +1,5 @@
 */.clangd
+*/RTE/**
 out/**
 tmp/**
 *.code-workspace

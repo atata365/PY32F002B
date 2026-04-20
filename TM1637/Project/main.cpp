@@ -1,3 +1,6 @@
+/* test program for 4digit LED display with TM1637*/
+/* used GPIOs PA0(clock) and PA1(data) */
+/* PIN assign PA0:#5, PA1:#6 (SOP14 package) */
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
@@ -35,7 +38,7 @@ void TIM14init() {
     /* (24000000(24MHz) / 6) = 4MHz */
     TIM14->PSC = 6;
     /* ARR(Auto Reload Resister) = 0..65535(16bit) */ 
-    /* 4MHz/5=800kHz */
+    /* 4MHz/5=800kHz = 1.25us cycle*/
     TIM14->ARR = TIM_ARR_ARR_Msk & 4;
     /* activate TIM14 counter*/
     TIM14->CR1 = TIM_CR1_CEN;
@@ -57,11 +60,11 @@ void GPIOinit(){
     GPIOA->BSRR |= GPIO_BSRR_BS0 | GPIO_BSRR_BS1;
 }
 
-void wait_125ns() {
+void wait() {
     /* reset counter */
     COUNT = 0;
     TIM14->CNT = 0;
-    /* wait for 125ns */
+    /* wait 1 cycle */
     while(COUNT < 1);
 }
 
@@ -69,11 +72,11 @@ void start_condition() {
     /* make start condition */
     /* reset PA1(data) */
     GPIOA->BSRR |= GPIO_BSRR_BR1;
-    /* wait for 100ms */
-    wait_125ns();
+    /* wait for 1.25us */
+    wait();
     /* reset PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BR0;
-    wait_125ns();
+    wait();
 }
 
 void stop_condition() {
@@ -83,11 +86,11 @@ void stop_condition() {
     TIM14->CNT = 0;
     /* set PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BS0;
-    /* wait for 100ms */
-    wait_125ns();
+    /* wait for 1.25us */
+    wait();
     /* set PA1(data) */
     GPIOA->BSRR |= GPIO_BSRR_BS1;
-    wait_125ns();
+    wait();
 }
 
 /* send 8 bit data */
@@ -104,11 +107,11 @@ void send_data(uint8_t data){
             GPIOA->BSRR |= GPIO_BSRR_BR1;
         }
         /* wait for 100ns(Setup time) */
-        wait_125ns();
+        wait();
         /* set(HIGH) PA0(clock) */
         GPIOA->BSRR |= GPIO_BSRR_BS0;
         /* wait for 100ms(HOLD time) */
-        wait_125ns();
+        wait();
         data >>= 1;
     }
     /* reset PA0(clock) */
@@ -116,12 +119,12 @@ void send_data(uint8_t data){
     /* reset_PA1(data)*/
     GPIOA->BSRR |= GPIO_BSRR_BR1;
     /* wait 100ns for data transfer end */
-    wait_125ns();
+    wait();
     /* wait for ACK(discare ACK) */
     /* set PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BS0;
     /* wait for 200ns(discared ACK) */
-    wait_125ns();
+    wait();
     /* reset PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BR0;
 }

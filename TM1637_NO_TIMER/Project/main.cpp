@@ -1,5 +1,5 @@
 /* test program for 4digit LED display with TM1637 */
-/* no timer version*/
+/* no timer version */
 /* used GPIOs PA0(clock) and PA1(data) */
 /* PIN assign PA0:#5, PA1:#6 (SOP14 package) */
 #include "RTE_Components.h"

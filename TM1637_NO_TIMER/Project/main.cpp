@@ -33,19 +33,16 @@ void GPIOinit(){
     GPIOA->BSRR |= GPIO_BSRR_BS0 | GPIO_BSRR_BS1;
 }
 
-void wait() {
-    __nop();
-}
-
 void start_condition() {
     /* make start condition */
     /* reset PA1(data) */
     GPIOA->BSRR |= GPIO_BSRR_BR1;
-    /* wait for 1.25us */
-    wait();
+    /* wait */
+    __NOP();
     /* reset PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BR0;
-    wait();
+    /* wait */
+    __NOP();
 }
 
 void stop_condition() {
@@ -55,11 +52,12 @@ void stop_condition() {
     TIM14->CNT = 0;
     /* set PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BS0;
-    /* wait for 1.25us */
-    wait();
+    /* wait */
+    __NOP();
     /* set PA1(data) */
     GPIOA->BSRR |= GPIO_BSRR_BS1;
-    wait();
+    /* wait */
+    __NOP();
 }
 
 /* send 8 bit data */
@@ -75,25 +73,25 @@ void send_data(uint8_t data){
             /* reset PA1(data) */
             GPIOA->BSRR |= GPIO_BSRR_BR1;
         }
-        /* wait for 100ns(Setup time) */
-        wait();
+        /* wait */
+        __NOP();
         /* set(HIGH) PA0(clock) */
         GPIOA->BSRR |= GPIO_BSRR_BS0;
         /* wait for 100ms(HOLD time) */
-        wait();
+        __NOP();
         data >>= 1;
     }
     /* reset PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BR0;
     /* reset_PA1(data)*/
     GPIOA->BSRR |= GPIO_BSRR_BR1;
-    /* wait 100ns for data transfer end */
-    wait();
+    /* wait */
+    __NOP();
     /* wait for ACK(discare ACK) */
     /* set PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BS0;
-    /* wait for 200ns(discared ACK) */
-    wait();
+    /* wait */
+    __NOP();
     /* reset PA0(clock) */
     GPIOA->BSRR |= GPIO_BSRR_BR0;
 }
@@ -183,5 +181,6 @@ int main() {
         send_data(digit_code[i]); 
         stop_condition();
         display_control(1,2); // display on, brightness 4/16
+        //for(int m=0; m<100000; m++); /* wait for a while */
     }
 }   

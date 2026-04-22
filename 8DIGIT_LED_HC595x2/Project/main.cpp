@@ -1,107 +1,79 @@
-/* test program for 8digit LED display with 74HC595x2*/
+/* test program for 8digit LED display with 74HC595x2 */
 /* used GPIOs PB0(DIO), PB1(CLK), PB2(LATCH) */
-/* PIN assign PB0:#5, PB1:#6, PB2:#7 (SOP14 package) */
+/* PIN assign PB0:#4, PB1:#3, PB2:#2 (SOP14 package) */
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
 /* counter, incremented every counter reset */
 volatile uint32_t COUNT;
 
-const uint8_t digit_code[10] = {
-    0b01011100, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
+/* numeric patten for 7seg. LED */
+const uint8_t digit_code[] = {
+    0b00111010, // 0
+    0b01100000, // 1
+    0b11011010, // 2
+    0b11110010, // 3
     0b01100110, // 4
-    0b01101101, // 5
-    0b01111100, // 6
-    0b00000111, // 7
-    0b01111111, // 8
-    0b01100111, // 9
+    0b10110110, // 5
+    0b00111110, // 6
+    0b11100000, // 7
+    0b11111110, // 8
+    0b11100110, // 9
+    0b00000010, // -
+    0b10011100, // [
+    0b11110000  // ]
 };
 
-/* TIM14 Interrupt Handler (IRQn=14) */
-extern "C" 
-    __attribute__((interrupt)) void TIM14_IRQHandler(void) {
-    COUNT++;
-    /* clear update interrupt flag */
-    TIM14->SR &= ~TIM_SR_UIF;
-}
+/* convert table for digit position to bit pattern */
+const uint8_t digit_pos[ ] = {
+    0b11101111, // position 0(10^0)
+    0b11011111, // position 1
+    0b10111111, // position 2
+    0b01111111, // position 3
+    0b11111110, // position 4
+    0b11111101, // position 5
+    0b11111011, // position 6
+    0b11110111  // position 7
+};
 
-void TIM14init() {
-    /* clear counter */
-    TIM14->CNT = 0;
-    /* activate TIM14 */
-    RCC->APBENR2 |= RCC_APBENR2_TIM14EN;
-    /* prescaler (make counter freq) */
-    /* 0..65535(16bit) */
-    /* (24000000(24MHz) / 6) = 4MHz */
-    TIM14->PSC = 6;
-    /* ARR(Auto Reload Resister) = 0..65535(16bit) */ 
-    /* 4MHz/5=800kHz = 1.25us cycle*/
-    TIM14->ARR = TIM_ARR_ARR_Msk & 4;
-    /* activate TIM14 counter*/
-    TIM14->CR1 = TIM_CR1_CEN;
-    /* activate TIM14 BRK_UP_TRG_COM */
-    TIM14->DIER |= TIM_DIER_UIE;
-    /* enable interrupts in NVIC */
-    NVIC->ISER[0] |= (1 << TIM14_IRQn);
-}
-
+/* activate GPIO and set mode */
+/* set PB0,PB1,PB2 to push-pull output mode */
 void GPIOinit(){
-    /* activate GPIOA */
-    RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
-    /* set PA0 snd PA1 to General purpose output mode */
-    GPIOA->MODER = (GPIOA->MODER & ~(GPIO_MODER_MODE0 | GPIO_MODER_MODE1))
-     | GPIO_MODER_MODE0_0 | GPIO_MODER_MODE1_0;
-    /* set PA0 and PA1 to push-pull mode */
-    GPIOA->OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1);
-    /* set PA0 and PA1 to high */
-    GPIOA->BSRR |= GPIO_BSRR_BS0 | GPIO_BSRR_BS1;
+    /* activate GPIOB */
+    RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
+    /* set PB0, PB1, PB2 to general purpose output mode */
+    GPIOB->MODER = (GPIOB->MODER & ~(GPIO_MODER_MODE0 | GPIO_MODER_MODE1 | GPIO_MODER_MODE2))
+                 | GPIO_MODER_MODE0_0 | GPIO_MODER_MODE1_0 | GPIO_MODER_MODE2_0;
+    /* set PB0, PB1, PB2 to push-pull mode */
+    GPIOB->OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1 | GPIO_OTYPER_OT2);
+    /* set PB0, PB1, PB2 to low */
+    GPIOB->BSRR |= GPIO_BSRR_BR0 | GPIO_BSRR_BR1 | GPIO_BSRR_BR2;
 }
 
-void wait() {
-    /* reset counter */
-    COUNT = 0;
-    TIM14->CNT = 0;
-    /* wait 1 cycle */
-    while(COUNT < 1);
-}
-
-/* send 8 bit data */
+/* send 8bit data to 74CH595 */
 void send_data(uint8_t data){
-    for(int i=0; i<8; i++){
-        /* reset(LOW) PA0(clock) */
-        GPIOA->BSRR |= GPIO_BSRR_BR0;
-        /* set or reset data bit(PA1) */
-        if(data & 1){
-            /* set PA1(data) */
-            GPIOA->BSRR |= GPIO_BSRR_BS1;
-        } else {
-            /* reset PA1(data) */
-            GPIOA->BSRR |= GPIO_BSRR_BR1;
-        }
-        /* wait for 100ns(Setup time) */
-        wait();
-        /* set(HIGH) PA0(clock) */
-        GPIOA->BSRR |= GPIO_BSRR_BS0;
-        /* wait for 100ms(HOLD time) */
-        wait();
+    for(int i = 0; i < 8; i++ ) {
+        /* set or reset DIO pin(PB0) */
+        data & 1 ? GPIOB->BSRR |= GPIO_BSRR_BR0 : GPIOB->BSRR |= GPIO_BSRR_BS0;
+        /* set(HIGH) PB1(CLK) */
+        GPIOB->BSRR |= GPIO_BSRR_BS1;
+        /* reset(low) PB1(CLK) */
+        GPIOB->BSRR |= GPIO_BSRR_BR1;
         data >>= 1;
     }
-    /* reset PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BR0;
-    /* reset_PA1(data)*/
-    GPIOA->BSRR |= GPIO_BSRR_BR1;
-    /* wait 100ns for data transfer end */
-    wait();
-    /* wait for ACK(discare ACK) */
-    /* set PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BS0;
-    /* wait for 200ns(discared ACK) */
-    wait();
-    /* reset PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BR0;
+}
+
+/* send column position and digit data to 74HC795 */
+/* arguments #1 unit8_t col:cloumn position */
+/*           #2 uint8_t data:number for display 0..9 and '-[]' */
+/*           #3 bool dot:true=show dot,false=no show dot */
+void send_col_data(uint8_t col,uint8_t data,bool dot) {
+    /* turn off the latch(turn off the LEDs) */
+    GPIOB->BSRR = GPIO_BSRR_BR2;
+    send_data(dot ? digit_code[data] | 1 : digit_code[data]);
+    send_data(digit_pos[col]);
+    /* turn on the latch(turn on the LEDs) */
+    GPIOB->BSRR = GPIO_BSRR_BS2;
 }
 
 int main() {
@@ -111,9 +83,7 @@ int main() {
     while(!(RCC->CR & RCC_CR_HSIRDY));
     /* initialize GPIO */
     GPIOinit();
-    /* initialize TIM14*/
-    TIM14init();
-    int i = 0,j = 0,k = 0,l = 0;
+    int i = 0,j = 0,k = 0,l = 0,m = 0,n = 0,o = 0,p = 0;
     while(1){
         i++;
         if(i >= 10){
@@ -130,12 +100,30 @@ int main() {
         }
         if(l >= 10){
             l = 0;
+            m++;
         }
-
-
-        send_data(digit_code[l]); 
-        send_data(digit_code[k]); // with colon, 2nd digit & 0x80
-        send_data(digit_code[j]); 
-        send_data(digit_code[i]); 
+        if(m >= 10){
+            m = 0;
+            n++;
+        }
+        if(n >= 10){
+            n = 0;
+            o++;
+        }
+        if(o >= 10){
+            o = 0;
+            p++;
+        }
+        if(p >= 10){
+            p = 0;
+        }
+        send_col_data(7,p,false);
+        send_col_data(6,o,false);
+        send_col_data(5,n,false);
+        send_col_data(4,m,false);
+        send_col_data(3,l,false);
+        send_col_data(2,k,false);
+        send_col_data(1,j,false);
+        send_col_data(0,i,false);
     }
 }   

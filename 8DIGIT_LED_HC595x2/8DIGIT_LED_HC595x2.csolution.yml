@@ -30,7 +30,8 @@ solution:
       target-set:
         - set:
           images:
-            - project-context: Project.Release
+            - project-context: Project.Debug
+              load: image
 
   # List of different build configurations.
   build-types:

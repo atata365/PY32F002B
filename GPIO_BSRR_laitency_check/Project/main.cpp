@@ -1,4 +1,4 @@
-/* test program for 8digit LED display with 74HC595x2 */
+/* test program for GPIOx->BSRR operation laitency check */
 /* used GPIOs PB0(DIO), PB1(CLK), PB2(LATCH) */
 /* PIN assign PB0:#4, PB1:#3, PB2:#2 (SOP14 package) */
 #include "RTE_Components.h"

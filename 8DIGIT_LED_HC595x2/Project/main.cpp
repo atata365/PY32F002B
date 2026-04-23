@@ -47,18 +47,18 @@ void GPIOinit(){
     /* set PB0, PB1, PB2 to push-pull mode */
     GPIOB->OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1 | GPIO_OTYPER_OT2);
     /* set PB0, PB1, PB2 to low */
-    GPIOB->BSRR |= GPIO_BSRR_BR0 | GPIO_BSRR_BR1 | GPIO_BSRR_BR2;
+    GPIOB->BSRR = GPIO_BSRR_BR0 | GPIO_BSRR_BR1 | GPIO_BSRR_BR2;
 }
 
 /* send 8bit data to 74CH595 */
 void send_data(uint8_t data){
     for(int i = 0; i < 8; i++ ) {
         /* set or reset DIO pin(PB0) */
-        data & 1 ? GPIOB->BSRR |= GPIO_BSRR_BR0 : GPIOB->BSRR |= GPIO_BSRR_BS0;
+        data & 1 ? GPIOB->BSRR = GPIO_BSRR_BR0 : GPIOB->BSRR = GPIO_BSRR_BS0;
         /* set(HIGH) PB1(CLK) */
-        GPIOB->BSRR |= GPIO_BSRR_BS1;
+        GPIOB->BSRR = GPIO_BSRR_BS1;
         /* reset(low) PB1(CLK) */
-        GPIOB->BSRR |= GPIO_BSRR_BR1;
+        GPIOB->BSRR = GPIO_BSRR_BR1;
         data >>= 1;
     }
 }

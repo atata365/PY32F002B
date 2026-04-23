@@ -1,0 +1,7 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=c:\\Users\\kfuji\\KeilStudio\\PY32F002B\\GPIO_BSRR_laitency_check\\out\\Project\\PY32F002Bx5\\Debug"
+    ],
+    "debug.hideSlowPreLaunchWarning": true,
+    "debug.showInStatusBar": "never"
+}

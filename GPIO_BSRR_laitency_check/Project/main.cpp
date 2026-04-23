@@ -2,6 +2,7 @@
 /* used GPIOs PB0(DIO), PB1(CLK), PB2(LATCH) */
 /* PIN assign PB0:#4, PB1:#3, PB2:#2 (SOP14 package) */
 #include "RTE_Components.h"
+#include "py32f002bx5.h"
 #include CMSIS_device_header
 
 /* activate GPIO and set mode */
@@ -19,21 +20,21 @@ void GPIOinit(){
 }
 
 int main() {
-    /* select clock source=HSI */
-    RCC->CR = RCC_CR_HSION;
-    /* wait for HSI stabirised */
-    while(!(RCC->CR & RCC_CR_HSIRDY));
     /* initialize GPIO */
     GPIOinit();
 
     while(1){
         /* set(HIGH) PB0(DATA) */
-        GPIOB->BSRR |= GPIO_BSRR_BS0;
+        GPIOB->BSRR = GPIO_BSRR_BS0;
         /* set(HIGH) PB1(CLK) */
-        GPIOB->BSRR |= GPIO_BSRR_BS1;
+        GPIOB->BSRR = GPIO_BSRR_BS1;
+        /* set(HIGH) PB2(LATCH) */
+        GPIOB->BSRR = GPIO_BSRR_BS2;
         /* reset(low) PB0(DATA) */
-        GPIOB->BSRR |= GPIO_BSRR_BS0;
+        GPIOB->BSRR = GPIO_BSRR_BR0;
         /* reset(low) PB1(CLK) */
-        GPIOB->BSRR |= GPIO_BSRR_BR1;
+        GPIOB->BSRR = GPIO_BSRR_BR1;
+        /* reset(low) PB2(LATCH) */
+        GPIOB->BSRR = GPIO_BSRR_BR2;
     }
 }   

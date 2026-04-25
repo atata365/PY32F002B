@@ -1,0 +1,44 @@
+{
+	"folders": [
+		{
+			"path": "../../../TM1637_NO_TIMER"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../ANTI_BRICK"
+		},
+		{
+			"path": "../../../CLOCK_SOURCE"
+		},
+		{
+			"path": "../../../Make500kHzPULSE"
+		},
+		{
+			"path": "../../../SMOOTH_BLINK_LED"
+		},
+		{
+			"path": "../../../SysTick"
+		},
+		{
+			"path": "../../../TIM1_INTERRUPT"
+		},
+		{
+			"path": "../../../TIM1_PWM"
+		},
+		{
+			"path": "../../../TIM14_INTERRUPT"
+		},
+		{
+			"path": "../../../TIM14_PWM"
+		},
+		{
+			"path": "../../../TM1637"
+		}
+	],
+	"settings": {
+		"debug.hideSlowPreLaunchWarning": true,
+		"debug.showInStatusBar": "never"
+	}
+}

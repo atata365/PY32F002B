@@ -2,13 +2,22 @@
 /* activate GPIO interrupt */
 /* input pin:PA0(#5) - connect to SW(pull-upped)*/
 /* output pin:PA1(#6) - connect to LED */
+/* short press switch, turn on the LED partially */
+/* long press switch, turn on the LED and locked */
 /* pin numbers are based on the PY32F002B SOP14 package */
 
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
-/* voratile resister for sys tick count */
-volatile uint32_t L;
+#define AVOID_CHETTERING 50
+#define LONG_PRESS_DURATION 600
+
+/* voratile resister for SysTick */
+volatile uint32_t L = 0;
+/* voratile resister for last SysTick */
+volatile uint32_t lAST_SysTick = 0;
+/* voratile resister for switch on duration */
+volatile uint32_t DURATION = 0;
 
 /*---------------------------------------*/
 /* excetion process routuine for SysTick */
@@ -23,18 +32,29 @@ extern "C" {
 /* EXTI0_1 Interrupt Handler */
 extern "C" {
     __attribute__((interrupt)) void EXTI0_1_IRQHandler(void) {
-        /* check rise or fall */
-        if(GPIOA->IDR & GPIO_IDR_ID0) {
-            /* falling edge */
-            /* turn off the LED at PA1 */
-            GPIOA->BSRR = GPIO_BSRR_BR1;
-        } else {
-            /* rising edge*/
-            /* turn on the LED at PA1 */
-            GPIOA->BSRR = GPIO_BSRR_BS1;
+        /* check EXTI interrupt line */
+        if(EXTI->PR & EXTI_PR_PR0) {
+            /* clear EXTI interrupt flag */
+            EXTI->PR |= EXTI_PR_PR0;
+            /* check rising edge*/
+            if(!(GPIOA->IDR & GPIO_IDR_ID0)) {
+                /* avoid chettering  */
+                if(L - lAST_SysTick > AVOID_CHETTERING) {
+                    DURATION = 0;
+                    lAST_SysTick = L;
+                    /* rising edge*/
+                    /* turn on the LED at PA1 */
+                    GPIOA->BSRR = GPIO_BSRR_BS1;
+                }
+            } else {
+                /* falling edge */
+                DURATION = L - lAST_SysTick;
+                if(DURATION < LONG_PRESS_DURATION) {
+                    /* turn off the LED at PA1 */
+                    GPIOA->BSRR = GPIO_BSRR_BR1;
+                }
+            }
         }
-        /* clear EXTI interrupt flag */
-        EXTI->PR |= EXTI_PR_PR0;
     }
 }
 

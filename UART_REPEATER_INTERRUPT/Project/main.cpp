@@ -9,6 +9,31 @@
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
+#define buffer_size 1024
+#define work_buffer_size 80
+volatile uint8_t received_data[buffer_size]; // variable to store received data
+volatile uint16_t data_index = 0; // index for received data
+volatile uint16_t data_length = 0; // length of received data
+volatile bool data_ready = false; // flag to indicate data is ready to be sent
+
+/* ISR for USART1(receive)*/
+extern "C" void USART1_IRQHandler() {
+    /* check overrun error and clear overrun error */
+    if (USART1->SR & USART_SR_ORE) (void)USART1->DR;
+    /* receive data from USART1 */
+    if (USART1->SR & USART_SR_RXNE) {
+        char received_char = USART1->DR; // read received data
+        //USART1->SR &= ~USART_SR_RXNE; // clear receive data register not empty flag
+        received_data[data_index++] = received_char; // store received data
+        data_length++;
+        if (data_index >= buffer_size) data_index = 0; // wrap around if buffer is full
+        if (data_length >= buffer_size) data_length = buffer_size; // cap data length at buffer size
+        if (received_char == '\n') { // if newline character is received, set data ready flag
+            data_ready = true; // set flag to indicate data is ready
+        }
+    }
+}
+
 /*--------------------------------------------------------*/
 /* initialize GPIO PA4(USART RX #9) and PA6(USART TX #10) */
 /* pin nubbers are based on SOP14 package                 */
@@ -52,28 +77,47 @@ void INIT_USART() {
     USART1->BRR = 156 << USART_BRR_DIV_Mantissa_Pos | 4 << USART_BRR_DIV_Fraction_Pos;
     /* enable USART,transmitter,receiver */
     USART1->CR1 |= USART_CR1_UE |USART_CR1_TE | USART_CR1_RE;
+    /* enable USART1 receive interrupt */
+    USART1->CR1 |= USART_CR1_RXNEIE;
+    /* set USART1 interrupt priority and enable USART1 interrupt in NVIC */
+    NVIC->IPR[USART1_IRQn] = 0; // set highest priority
+    /* enable interrupts in NVIC */
+    NVIC->ISER[0] = (1 << USART1_IRQn);
 }
 
 int main() {
+    uint8_t work_buffer[work_buffer_size]; // buffer for processing data
+    int i = 0; // index for work buffer
+    int j = 0; // index for sending data
+    uint16_t work_length; // length of data in work buffer
+    uint16_t work_index; // index for processing data in work buffer
+
     INIT_GPIOs();
     INIT_USART();
     while (1) {
-        /* check overrun error abd clear overrun error */
-        while(USART1->SR & USART_SR_ORE) (void)USART1->DR;
-        /* receive data from USART1 */
-        if (USART1->SR & USART_SR_RXNE) {
-            char received_char = USART1->DR; // read received data
-            /* echo back the received character */
-            while (!(USART1->SR & USART_SR_TXE)); // wait until transmit data register is empty
-            USART1->DR = received_char; // send back the received character
-            /* wait for transmission to complete */
-            while (!(USART1->SR & USART_SR_TC));
+        
+        /* check if data is ready to be sent */
+        if (data_ready) {
+            data_ready = false; // reset data ready flag
+            work_index = data_index; // calculate start index of data in buffer
+            work_length = data_length; // calculate length of data to be sent
+            if(work_index < work_length) work_index = work_index + buffer_size - work_length;
+            else work_index -= work_length;
+        	for(i = 0;i < work_buffer_size;i++){
+                if(work_index >= buffer_size) work_index = 0;
+	        	work_buffer[i] = received_data[work_index]; // copy data to work buffer
+		        work_index++;
+		        if(work_buffer[i] == '\n') {
+                    i++; // include newline character in work buffer
+                    break; // stop copying if newline character is found
+                }
+	        }
+            data_length -= i; // update data length after processing
+            for(j = 0;j < work_length;j++){              
+                USART1->DR = work_buffer[j]; // send data from work buffer
+                /* wait for transmission to complete */
+                while (!(USART1->SR & USART_SR_TC));
+            }
         }
-        /* transmit data via USART1 */
-        //if (USART1->SR & USART_SR_TXE) {
-        //    USART1->DR = 'A'; // send character 'A' continuously
-        //    /* wait for transmission to complete */
-        //    while (!(USART1->SR & USART_SR_TC));
-        //}
     }
 }

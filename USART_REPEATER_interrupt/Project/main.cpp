@@ -112,7 +112,7 @@ int main() {
                 }
 	        }
             data_length -= i; // update data length after processing
-            for(j = 0;j < work_length;j++){              
+            for(j = 0;j < i;j++){              
                 USART1->DR = work_buffer[j]; // send data from work buffer
                 /* wait for transmission to complete */
                 while (!(USART1->SR & USART_SR_TC));

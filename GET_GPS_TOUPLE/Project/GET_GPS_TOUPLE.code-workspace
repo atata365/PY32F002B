@@ -1,0 +1,62 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../8DIGIT_LED_HC595x2"
+		},
+		{
+			"path": "../../ANTI_BRICK"
+		},
+		{
+			"path": "../../CLOCK_SOURCE"
+		},
+		{
+			"path": "../../GPIO_BSRR_laitency_check"
+		},
+		{
+			"path": "../../GPIO_INTERRUPT"
+		},
+		{
+			"path": "../../GPS_CLOCK_4DIGIT_LED"
+		},
+		{
+			"path": "../../Make500kHzPULSE"
+		},
+		{
+			"path": "../../SMOOTH_BLINK_LED"
+		},
+		{
+			"path": "../../SysTick"
+		},
+		{
+			"path": "../../TIM1_INTERRUPT"
+		},
+		{
+			"path": "../../TIM1_PWM"
+		},
+		{
+			"path": "../../TIM14_INTERRUPT"
+		},
+		{
+			"path": "../../TIM14_PWM"
+		},
+		{
+			"path": "../../TM1637"
+		},
+		{
+			"path": "../../TM1637_NO_TIMER"
+		},
+		{
+			"path": "../../UART_REPEATER"
+		},
+		{
+			"path": "../../USART_REPEATER_interrupt"
+		}
+	],
+	"settings": {
+		"debug.hideSlowPreLaunchWarning": true,
+		"debug.showInStatusBar": "never"
+	}
+}

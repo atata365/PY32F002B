@@ -14,7 +14,7 @@
 volatile uint8_t received_data[buffer_size]; // variable to store received data
 volatile uint16_t data_index = 0; // index for received data
 volatile uint16_t data_length = 0; // length of received data
-volatile bool data_ready = false; // flag to indicate data is ready to be sent
+volatile uint8_t data_lines = 0; // count of newline characters in received data
 
 /* ISR for USART1(receive)*/
 extern "C" void USART1_IRQHandler() {
@@ -29,7 +29,7 @@ extern "C" void USART1_IRQHandler() {
         if (data_index >= buffer_size) data_index = 0; // wrap around if buffer is full
         if (data_length >= buffer_size) data_length = buffer_size; // cap data length at buffer size
         if (received_char == '\n') { // if newline character is received, set data ready flag
-            data_ready = true; // set flag to indicate data is ready
+            data_lines++; // increment newline character count
         }
     }
 }
@@ -96,8 +96,8 @@ int main() {
     INIT_USART();
     while (1) {
         /* check if data is ready to be sent */
-        if (data_ready) {
-            data_ready = false; // reset data ready flag
+        if (data_lines > 0) { // check if there are lines of data to be sent
+            data_lines--; // decrement line count
             work_index = data_index; // calculate start index of data in buffer
             work_length = data_length; // calculate length of data to be sent
             if(work_index < work_length) work_index = work_index + buffer_size - work_length;

@@ -346,11 +346,11 @@ int main() {
             data_length -= i; // update data length after processing
             i = get_toupe(work_buffer,touple_buffer,0); // get record indication
             if((touple_buffer[0] == '$')
-               & (touple_buffer[1] == 'G')
-               & (touple_buffer[2] == 'N')
-               & (touple_buffer[3] == 'G')
-               & (touple_buffer[4] == 'G')
-               & (touple_buffer[5] == 'A')) {
+             & (touple_buffer[1] == 'G')
+             & (touple_buffer[2] == 'N')
+             & (touple_buffer[3] == 'G')
+             & (touple_buffer[4] == 'G')
+             & (touple_buffer[5] == 'A')) {
                 j = get_toupe(work_buffer,touple_buffer,1); // get time
                 hh = (touple_buffer[0] - '0') * 10 + (touple_buffer[1] - '0');
                 mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');

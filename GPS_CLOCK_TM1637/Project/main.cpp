@@ -1,10 +1,14 @@
 /* UART repeater */
 /* This program is maken for PY32F002B SOP14 package */
-/* It's a simple UART repeater that forwards data received */ 
-/* on USART1 to the same USART1 */
+/* receve GPS(NMEA) data from NEO-6M(or simular) and */
+/* display time to the TM1637 based 4-digit 7-segment display */ 
+/* - USART settings - */
 /* fixed baud rate: 9600 bps */
-/* data receive port as PA4(USART RX #9) */
-/* repeat data port as PA6(USART TX #10) */
+/* - connections -*/
+/* data receive port as PA4(#9 USART RX) */
+/* repeat data port as PA6(#10 USART TX) */
+/* display clock port as PB0(#4 clock to TX1637) */
+/* display data port as PB1(#3 data to TX1637) */
 /* port numbers are based on SOP14 package */
 #include "RTE_Components.h"
 #include CMSIS_device_header
@@ -16,6 +20,7 @@ volatile uint8_t received_data[buffer_size]; // variable to store received data
 volatile uint16_t data_index = 0; // index for received data
 volatile uint16_t data_length = 0; // length of received data
 volatile uint8_t data_lines = 0; // count of newline characters in received data
+volatile uint32_t colon_blink; // variable for colon blinking control
 
 /* voratile resister for sys tick count */
 volatile uint32_t L;
@@ -37,11 +42,10 @@ const uint8_t digit_code[10] = {
 /* ISR for SysTick                */
 /* This routine called every 1ms. */
 /*--------------------------------*/
-extern "C" {
-    void SysTick_Handler(void) {
-        L++;
-    }
+extern "C" void SysTick_Handler(void) {
+    L++;
 }
+
 
 /*-------------------------------------*/
 /* initSysTick                         */
@@ -109,9 +113,9 @@ extern "C" void USART1_IRQHandler() {
 /* pin nubbers are based on SOP14 package                 */
 /*--------------------------------------------------------*/
 void INIT_GPIOs() {
+    /* enable GPIOA(USART1 TX/RX) and GPIOB(clock and data for TM1637) */
+    RCC->IOPENR |= RCC_IOPENR_GPIOAEN | RCC_IOPENR_GPIOBEN;
     /* initialize GPIO for USART (PA4 , PA6) */
-    /* enable GPIOA clock */
-    RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
     /* set PA6(TX) and PA4(RX) to AF1 (USART1) */
     GPIOA->AFR[0] = (GPIOA->AFR[0] & ~(GPIO_AFRL_AFSEL4_Msk | GPIO_AFRL_AFSEL6_Msk))
                                         | GPIO_AFRL_AFSEL4_0 | GPIO_AFRL_AFSEL6_0;
@@ -122,13 +126,22 @@ void INIT_GPIOs() {
     GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD4_Msk) | GPIO_PUPDR_PUPD4_0;
     /* settings for GPIO PA6 */
     /* change PA6(TX) to multiplexed mode */
-    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE6_Msk) | GPIO_MODER_MODE6_1; 
+    //GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE6_Msk) | GPIO_MODER_MODE6_1; 
     /* change PA6(TX) to push-pull mode */
-    GPIOA->OTYPER |= GPIO_OTYPER_OT6;
+    //GPIOA->OTYPER |= GPIO_OTYPER_OT6;
     /* set PA6(TX) speed to very HIGH speed */
-    GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_0 | GPIO_OSPEEDR_OSPEED6_1;
+    //GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_0 | GPIO_OSPEEDR_OSPEED6_1;
     /* activate pull-up */
-    GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD6_Msk) | GPIO_PUPDR_PUPD6_0;
+    //GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD6_Msk) | GPIO_PUPDR_PUPD6_0;
+    /* initialize GPIOB for TM1637 (PB0:clock , PB1:data) */
+    /* set PB0 and PB1 to output mode */
+    GPIOB->MODER = (GPIOB->MODER & ~(GPIO_MODER_MODE0_Msk | GPIO_MODER_MODE1_Msk))
+                                     | GPIO_MODER_MODE0_0 | GPIO_MODER_MODE1_0;
+    /* set PB0 and PB1 OTYPE to push-pull */
+    GPIOB->OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1); /* set PB0 and PB1 to push-pull mode */
+    /* set PB0 and PB1 speed to very HIGH speed */
+    GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED0_0 | GPIO_OSPEEDR_OSPEED0_1
+                     | GPIO_OSPEEDR_OSPEED1_0 | GPIO_OSPEEDR_OSPEED1_1;
 }
 
 /*-------------------*/
@@ -178,12 +191,12 @@ int get_toupe(uint8_t *source,uint8_t *dest,uint8_t num_touple) {
 /*----------------------*/
 void start_condition() {
     /* make start condition */
-    /* reset PA1(data) */
-    GPIOA->BSRR |= GPIO_BSRR_BR1;
+    /* reset PB1(data) */
+    GPIOB->BSRR |= GPIO_BSRR_BR1;
     /* wait */
     __NOP();
-    /* reset PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BR0;
+    /* reset PB0(clock) */
+    GPIOB->BSRR |= GPIO_BSRR_BR0;
     /* wait */
     __NOP();
 }
@@ -193,12 +206,12 @@ void start_condition() {
 /*---------------------*/
 void stop_condition() {
     /* make stop condition */
-    /* set PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BS0;
+    /* set PB0(clock) */
+    GPIOB->BSRR |= GPIO_BSRR_BS0;
     /* wait */
     __NOP();
-    /* set PA1(data) */
-    GPIOA->BSRR |= GPIO_BSRR_BS1;
+    /* set PB1(data) */
+    GPIOB->BSRR |= GPIO_BSRR_BS1;
     /* wait */
     __NOP();
 }
@@ -208,37 +221,37 @@ void stop_condition() {
 /*-----------------*/
 void send_data(uint8_t data){
     for(int i=0; i<8; i++){
-        /* reset(LOW) PA0(clock) */
-        GPIOA->BSRR |= GPIO_BSRR_BR0;
-        /* set or reset data bit(PA1) */
+        /* reset(LOW) PB0(clock) */
+        GPIOB->BSRR |= GPIO_BSRR_BR0;
+        /* set or reset data bit(PB1) */
         if(data & 1){
-            /* set PA1(data) */
-            GPIOA->BSRR |= GPIO_BSRR_BS1;
+            /* set PB1(data) */
+            GPIOB->BSRR |= GPIO_BSRR_BS1;
         } else {
-            /* reset PA1(data) */
-            GPIOA->BSRR |= GPIO_BSRR_BR1;
+            /* reset PB1(data) */
+            GPIOB->BSRR |= GPIO_BSRR_BR1;
         }
         /* wait */
         __NOP();
-        /* set(HIGH) PA0(clock) */
-        GPIOA->BSRR |= GPIO_BSRR_BS0;
+        /* set(HIGH) PB0(clock) */
+        GPIOB->BSRR |= GPIO_BSRR_BS0;
         /* wait for 100ms(HOLD time) */
         __NOP();
         data >>= 1;
     }
-    /* reset PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BR0;
-    /* reset_PA1(data)*/
-    GPIOA->BSRR |= GPIO_BSRR_BR1;
+    /* reset PB0(clock) */
+    GPIOB->BSRR |= GPIO_BSRR_BR0;
+    /* reset_PB1(data)*/
+    GPIOB->BSRR |= GPIO_BSRR_BR1;
     /* wait */
     __NOP();
     /* wait for ACK(discare ACK) */
-    /* set PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BS0;
+    /* set PB0(clock) */
+    GPIOB->BSRR |= GPIO_BSRR_BS0;
     /* wait */
     __NOP();
-    /* reset PA0(clock) */
-    GPIOA->BSRR |= GPIO_BSRR_BR0;
+    /* reset PB0(clock) */
+    GPIOB->BSRR |= GPIO_BSRR_BR0;
 }
 
 /*-----------------------------------------*/
@@ -299,17 +312,24 @@ void set_col(uint8_t col){
     send_data(0b11000000 | (col & 0b00000111));
 }
 
-void display_time(int hh, int mm) {
-    int i = hh / 10; // tens digit of hours
-    int j = hh % 10; // units digit of hours
-    int k = mm / 10; // tens digit of minutes
-    int l = mm % 10; // units digit of minutes
+/*------------------------*/
+/* display time on TM1637 */
+/*------------------------*/
+void display_time(int hh, int mm, bool colon) {
+    int m = hh / 10; // tens digit of hours
+    int n = hh % 10; // units digit of hours
+    int o = mm / 10; // tens digit of minutes
+    int p = mm % 10; // units digit of minutes
     col_mode(0); // auto increment mode
     set_col(0); // set column to 0
-    send_data(digit_code[i]); 
-    send_data(digit_code[j]); // with colon, 2nd digit & 0x80
-    send_data(digit_code[k]); 
-    send_data(digit_code[l]); 
+    send_data(digit_code[m]);
+    if(colon) {
+        send_data(digit_code[n] | 0b10000000); // add colon bit to the units digit of hours
+    } else {
+        send_data(digit_code[n]);
+    }
+    send_data(digit_code[o]); 
+    send_data(digit_code[p]); 
     stop_condition();
     display_control(1,2); // display on, brightness 4/16
 }
@@ -318,6 +338,7 @@ int main() {
     uint8_t work_buffer[work_buffer_size]; // buffer for processing data
     int i = 0; // index for work buffer
     int j = 0; // index for sending data
+    int k = 0; // index for time touple
     uint16_t work_length; // length of data in work buffer
     uint16_t work_index; // index for processing data in work buffer
     uint8_t touple_buffer[max_touple_length]; // buffer for extracted touple
@@ -351,20 +372,19 @@ int main() {
              & (touple_buffer[3] == 'G')
              & (touple_buffer[4] == 'G')
              & (touple_buffer[5] == 'A')) {
+                colon_blink = millis(); // reset colon blink timer
                 j = get_toupe(work_buffer,touple_buffer,1); // get time
-                hh = (touple_buffer[0] - '0') * 10 + (touple_buffer[1] - '0');
-                mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');
-                ss = (touple_buffer[4] - '0') * 10 + (touple_buffer[5] - '0');
-                hh = (hh + 9) % 24; // convert UTC to JST (UTC+9);
-                for(i = 0;i < j;i++) {
-                    USART1->DR = touple_buffer[i]; // send data from work buffer
-                    /* wait for transmission to complete */
-                    while (!(USART1->SR & USART_SR_TC));
+                if(j > 6) { // check if time touple has correct length
+                    hh = (touple_buffer[0] - '0') * 10 + (touple_buffer[1] - '0');
+                    mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');
+                    ss = (touple_buffer[4] - '0') * 10 + (touple_buffer[5] - '0');
+                    hh = (hh + 9) % 24; // convert UTC to JST (UTC+9);
+                    display_time(hh, mm, true); // display time on TM1637
                 }
-                USART1->DR = '\n'; // send newline character after sending touple
-                /* wait for transmission to complete */
-                while (!(USART1->SR & USART_SR_TC));
             }
+        } else if(millis() - colon_blink > 500) { // toggle colon every 500ms
+            colon_blink += 1500; // reset colon blink timer
+            display_time(hh, mm, false); // toggle colon off
         }
     }
 }

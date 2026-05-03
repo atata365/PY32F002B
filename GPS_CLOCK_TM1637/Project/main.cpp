@@ -1,4 +1,4 @@
-/* UART repeater */
+/* minimum GPS clock */
 /* This program is maken for PY32F002B SOP14 package */
 /* receve GPS(NMEA) data from NEO-6M(or simular) and */
 /* display time to the TM1637 based 4-digit 7-segment display */ 
@@ -6,7 +6,7 @@
 /* fixed baud rate: 9600 bps */
 /* - connections -*/
 /* data receive port as PA4(#9 USART RX) */
-/* repeat data port as PA6(#10 USART TX) */
+/* data transmit port as PA6(#10 USART TX) for debugging */
 /* display clock port as PB0(#4 clock to TX1637) */
 /* display data port as PB1(#3 data to TX1637) */
 /* port numbers are based on SOP14 package */
@@ -365,7 +365,7 @@ int main() {
                 }
 	        }
             data_length -= i; // update data length after processing
-            i = get_toupe(work_buffer,touple_buffer,0); // get record indication
+            i = get_toupe(work_buffer,touple_buffer,0); // get record indication touple
             if((touple_buffer[0] == '$')
              & (touple_buffer[1] == 'G')
              & (touple_buffer[2] == 'N')
@@ -382,7 +382,8 @@ int main() {
                     display_time(hh, mm, true); // display time on TM1637
                 }
             }
-        } else if(millis() - colon_blink > 500) { // toggle colon every 500ms
+        } 
+        if((millis() - colon_blink > 500) && (colon_blink != 0)) { // toggle colon every 500ms
             colon_blink += 1500; // reset colon blink timer
             display_time(hh, mm, false); // toggle colon off
         }

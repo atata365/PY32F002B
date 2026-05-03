@@ -46,7 +46,6 @@ extern "C" void SysTick_Handler(void) {
     L++;
 }
 
-
 /*-------------------------------------*/
 /* initSysTick                         */
 /* start SysTick interrupt and counter */

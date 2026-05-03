@@ -334,13 +334,38 @@ void display_time(int hh, int mm, bool colon) {
     display_control(1,2); // display on, brightness 4/16
 }
 
+/*--------------------------------------------------*/
+/* get a line of data from the received data buffer */
+/*--------------------------------------------------*/
+int get_a_line(uint8_t *dest, int max_length) {
+    int i; // index for destination buffer
+    int work_index; // index for processing data in work buffer
+    int work_length; // length of data to be processed in work buffer
+    
+    /* check if data is ready to be sent */
+    if (data_lines > 0) { // check if there are lines of data to be sent
+        data_lines--; // decrement line count
+        work_index = data_index; // calculate start index of data in buffer
+        work_length = data_length; // calculate length of data to be sent
+        if(work_index < work_length) work_index = work_index + buffer_size - work_length;
+        else work_index -= work_length;
+        for(i = 0;i < max_length;i++){
+            if(work_index >= buffer_size) work_index = 0;
+            dest[i] = received_data[work_index]; // copy data to work buffer
+            work_index++;
+            if(dest[i] == '\n') {
+                i++; // include newline character in work buffer
+                break; // stop copying if newline character is found
+            }
+        }
+        data_length -= i; // update data length after processing
+        return i; // return length of the line copied to work buffer}
+    }
+    return 0; // return 0 if no data is ready
+}
+
 int main() {
     uint8_t work_buffer[work_buffer_size]; // buffer for processing data
-    int i = 0; // index for work buffer
-    int j = 0; // index for sending data
-    int k = 0; // index for time touple
-    uint16_t work_length; // length of data in work buffer
-    uint16_t work_index; // index for processing data in work buffer
     uint8_t touple_buffer[max_touple_length]; // buffer for extracted touple
     int hh, mm, ss; // variables for time components
 
@@ -348,43 +373,27 @@ int main() {
     INIT_USART();
     initSysTick(); // initialize SysTick for timing functions
     while (1) {
-        /* check if data is ready to be sent */
-        if (data_lines > 0) { // check if there are lines of data to be sent
-            data_lines--; // decrement line count
-            work_index = data_index; // calculate start index of data in buffer
-            work_length = data_length; // calculate length of data to be sent
-            if(work_index < work_length) work_index = work_index + buffer_size - work_length;
-            else work_index -= work_length;
-        	for(i = 0;i < work_buffer_size;i++){
-                if(work_index >= buffer_size) work_index = 0;
-	        	work_buffer[i] = received_data[work_index]; // copy data to work buffer
-		        work_index++;
-		        if(work_buffer[i] == '\n') {
-                    i++; // include newline character in work buffer
-                    break; // stop copying if newline character is found
-                }
-	        }
-            data_length -= i; // update data length after processing
-            i = get_toupe(work_buffer,touple_buffer,0); // get record indication touple
-            if((touple_buffer[0] == '$')
-             & (touple_buffer[1] == 'G')
-             & (touple_buffer[2] == 'N')
-             & (touple_buffer[3] == 'G')
-             & (touple_buffer[4] == 'G')
-             & (touple_buffer[5] == 'A')) {
-                colon_blink = millis(); // reset colon blink timer
-                j = get_toupe(work_buffer,touple_buffer,1); // get time
-                if(j > 6) { // check if time touple has correct length
-                    hh = (touple_buffer[0] - '0') * 10 + (touple_buffer[1] - '0');
-                    mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');
-                    ss = (touple_buffer[4] - '0') * 10 + (touple_buffer[5] - '0');
-                    hh = (hh + 9) % 24; // convert UTC to JST (UTC+9);
-                    display_time(hh, mm, true); // display time on TM1637
+        if(get_a_line(work_buffer, work_buffer_size) > 0) { // get a line of data from the received data buffer
+            if(get_toupe(work_buffer,touple_buffer,0) == 6) { // get record indication touple
+                if((touple_buffer[0] == '$')
+                 & (touple_buffer[1] == 'G')
+                 & (touple_buffer[2] == 'N')
+                 & (touple_buffer[3] == 'G')
+                 & (touple_buffer[4] == 'G')
+                 & (touple_buffer[5] == 'A')) {
+                    if(get_toupe(work_buffer,touple_buffer,1) == 10) { // get time
+                        colon_blink = millis(); // reset colon blink timer
+                        hh = (touple_buffer[0] - '0') * 10 + (touple_buffer[1] - '0');
+                        mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');
+                        ss = (touple_buffer[4] - '0') * 10 + (touple_buffer[5] - '0');
+                        hh = (hh + 9) % 24; // convert UTC to JST (UTC+9);
+                        display_time(hh, mm, true); // display time on TM1637
+                    }
                 }
             }
         } 
         if((millis() - colon_blink > 500) && (colon_blink != 0)) { // toggle colon every 500ms
-            colon_blink += 1500; // reset colon blink timer
+            colon_blink = 0; // reset colon blink timer
             display_time(hh, mm, false); // toggle colon off
         }
     }

@@ -1,0 +1,60 @@
+# A solution is a collection of related projects that share same base configuration.
+solution:
+  created-for: CMSIS-Toolbox@2.12.0
+  cdefault: # use CMSIS-Toolbox default Compiler options
+
+  # Compilers that can be selected
+  select-compiler:
+    - compiler: AC6
+    - compiler: GCC
+    - compiler: IAR
+    - compiler: CLANG
+
+  # List of miscellaneous tool-specific controls
+  misc:
+    - for-compiler: AC6 # GDB requires DWARF 5, remove when using uVision Debugger
+      C-CPP:
+        - -gdwarf-5
+      ASM:
+        - -gdwarf-5
+
+  # List the packs that define the device and/or board.
+  packs:
+    - pack: Puya::PY32F0xx_DFP
+    - pack: ARM::CMSIS
+
+  # List different hardware targets that are used to deploy the solution.
+  target-types:
+    - type: PY32F002Bx5
+      device: PY32F002Bx5
+      target-set:
+        - set:
+          images:
+            - project-context: ADD_SEC_ALT_SPEED_HEADING.Debug
+            - project-context: ADD_SEC_ALT_SPEED.Debug
+            - project-context: ADD_SEC_ALT.Debug
+            - project-context: ADD_BRIGHTNESS_CHANGE.Debug
+            - project-context: ADD_SEC.Debug
+            - project-context: ADD_SW.Debug
+            - project-context: BASE.Debug
+
+  # List of different build configurations.
+  build-types:
+    - type: Debug
+      debug: on
+      optimize: none
+
+    - type: Release
+      debug: off
+      optimize: balanced
+
+  # List related projects.
+  projects:
+    - project: BASE/BASE.cproject.yml
+    - project: ADD_SW/ADD_SW.cproject.yml
+    - project: ADD_SEC/ADD_SEC.cproject.yml
+    - project: ADD_BRIGHTNESS_CHANGE/ADD_BRIGHTNESS_CHANGE.cproject.yml
+    - project: ADD_SEC_ALT/ADD_SEC_ALT.cproject.yml
+    - project: ADD_SEC_ALT_SPEED/ADD_SEC_ALT_SPEED.cproject.yml
+    - project: ADD_SEC_ALT_SPEED_HEADING/ADD_SEC_ALT_SPEED_HEADING.cproject.yml
+  compiler: AC6

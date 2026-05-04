@@ -22,7 +22,7 @@ volatile uint16_t data_length = 0; // length of received data
 volatile uint8_t data_lines = 0; // count of newline characters in received data
 volatile uint32_t colon_blink; // variable for colon blinking control
 
-/* voratile register for sys tick count */
+/* voratile resister for sys tick count */
 volatile uint32_t L;
 
 const uint8_t digit_code[10] = {

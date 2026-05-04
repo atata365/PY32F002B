@@ -12,11 +12,11 @@
 #define AVOID_CHETTERING 50
 #define LONG_PRESS_DURATION 600
 
-/* voratile resister for SysTick */
+/* voratile register for SysTick */
 volatile uint32_t L = 0;
-/* voratile resister for last SysTick */
+/* voratile register for last SysTick */
 volatile uint32_t lAST_SysTick = 0;
-/* voratile resister for switch on duration */
+/* voratile register for switch on duration */
 volatile uint32_t DURATION = 0;
 
 /*---------------------------------------*/

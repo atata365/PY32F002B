@@ -16,13 +16,17 @@
 #define buffer_size 1024
 #define work_buffer_size 80
 #define max_touple_length 12
-volatile uint8_t received_data[buffer_size]; // variable to store received data
+/* voratile register for receive data buffer */
+volatile uint8_t received_data[buffer_size]; // buffer to store received data
 volatile uint16_t data_index = 0; // index for received data
 volatile uint16_t data_length = 0; // length of received data
 volatile uint8_t data_lines = 0; // count of newline characters in received data
+/* voratile register for LED display */
 volatile uint32_t colon_blink; // variable for colon blinking control
-
-/* voratile register for sys tick count */
+/* voratile register for EXTI(SW) */
+volatile uint8_t AVOID_CHETTERING = 50; // debounce time in milliseconds
+volatile uint16_t LONG_PRESS_DURATION = 600; // long press duration in milliseconds
+/* voratile register for SysTick count */
 volatile uint32_t L;
 
 const uint8_t digit_code[10] = {
@@ -361,6 +365,36 @@ int get_a_line(uint8_t *dest, int max_length) {
         return i; // return length of the line copied to work buffer}
     }
     return 0; // return 0 if no data is ready
+}
+
+/*---------------------------------------------------------------------*/
+/* ISR for EXTI0_1 (EXTI line 0 and 1)                                 */
+/* This routine is called when an interrupt occurs on EXTI line 0 or 1 */
+/*---------------------------------------------------------------------*/
+extern "C"  void EXTI0_1_IRQHandler(void) {
+    /* check EXTI interrupt line */
+    if(EXTI->PR & EXTI_PR_PR0) {
+        /* clear EXTI interrupt flag */
+        EXTI->PR |= EXTI_PR_PR0;
+        /* check rising edge*/
+        if(!(GPIOA->IDR & GPIO_IDR_ID0)) {
+            /* avoid chettering  */
+            if(L - lAST_SysTick > AVOID_CHETTERING) {
+                DURATION = 0;
+                lAST_SysTick = L;
+                /* rising edge*/
+                /* turn on the LED at PA1 */
+                GPIOA->BSRR = GPIO_BSRR_BS1;
+            }
+        } else {
+            /* falling edge */
+            DURATION = L - lAST_SysTick;
+            if(DURATION < LONG_PRESS_DURATION) {
+                /* turn off the LED at PA1 */
+                GPIOA->BSRR = GPIO_BSRR_BR1;
+            }
+        }
+    }
 }
 
 int main() {

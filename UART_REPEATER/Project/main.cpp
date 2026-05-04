@@ -11,7 +11,7 @@
 
 /*--------------------------------------------------------*/
 /* initialize GPIO PA4(USART RX #9) and PA6(USART TX #10) */
-/* pin nubbers are based on SOP14 package                 */
+/* pin numbers are based on SOP14 package                 */
 /*--------------------------------------------------------*/
 void INIT_GPIOs() {
     /* initialize GPIO for USART (PA4 , PA6) */
@@ -41,7 +41,7 @@ void INIT_GPIOs() {
 /*-------------------*/
 /* USART1 TX -> PA6(#10) */
 /* USART1 RX -> PA4(#9) */
-/* pin nubbers are based on SOP14 package */
+/* pin numbers are based on SOP14 package */
 void INIT_USART() {
     /* enable USART1 clock */
     RCC->APBENR2 |= RCC_APBENR2_USART1EN;

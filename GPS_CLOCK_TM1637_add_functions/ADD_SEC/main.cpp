@@ -11,8 +11,11 @@
 /* display data port as PB1(#3 data to TX1637) */
 /* brightness change and mode cange switch connect to PA0 */
 /* port numbers are based on SOP14 package */
-/* - operatioon - */
-/* lona press the switch to change LED brightness */
+/* - operation - */
+/* lon press the switch to change LED brightness */
+/* short press the switch to toggle display mode */
+/* mode 0: display hours and minutes */
+/* mode 1: display minutes and seconds */
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
@@ -20,8 +23,8 @@
 #define work_buffer_size 80
 #define max_touple_length 12
 #define modes 2
-#define avoid_chettring_time 100 // debounce time in milliseconds
-#define long_press_time 400 // long press duration in milliseconds 
+#define avoid_chettring_time 500 // debounce time in milliseconds
+#define long_press_time 500 // long press duration in milliseconds 
 #define max_brightness 8 // maximum brightness level (for long press)
 /* voratile register for receive data buffer */
 volatile uint8_t received_data[buffer_size]; // buffer to store received data
@@ -32,7 +35,7 @@ volatile uint8_t data_lines = 0; // count of newline characters in received data
 volatile uint32_t colon_blink; // variable for colon blinking control
 volatile uint8_t brightness = 2; // variable for brightness control
 /* voratile register for EXTI(SW) */
-volatile uint8_t avoid_chettering = avoid_chettring_time; // debounce time in milliseconds
+volatile uint16_t avoid_chettering = avoid_chettring_time; // debounce time in milliseconds
 volatile uint16_t long_press_duration = long_press_time; // long press duration in milliseconds
 volatile uint32_t last_SysTick = 0; // last SysTick value for debounce and long press detection
 volatile uint8_t current_mode = 0; // variable for mode control
@@ -413,7 +416,7 @@ extern "C"  void EXTI0_1_IRQHandler(void) {
             } else {
                 /* long press */
                 brightness = (brightness + 2) % max_brightness; // change brightness
-                mode_changed = false; // set mode change flag
+                mode_changed = false; // set mode change flag to false for long press
             }
         }
     }
@@ -466,7 +469,14 @@ int main() {
                         mm = (touple_buffer[2] - '0') * 10 + (touple_buffer[3] - '0');
                         ss = (touple_buffer[4] - '0') * 10 + (touple_buffer[5] - '0');
                         hh = (hh + 9) % 24; // convert UTC to JST (UTC+9);
-                        display_time(hh, mm, true); // display time on TM1637 with colon on  
+                        if(current_mode == 0) {
+                            display_time(hh, mm, true); // display time on TM1637
+                            mode_changed = false; // reset mode change flag
+                        } else if(current_mode == 1) {  
+                            display_time(mm, ss, true); // display time on TM1637
+                            mode_changed = false; // reset mode change flag
+                            colon_blink = 0; // reset colon blink timer
+                        }
                     }
                     clear_buffer();
                 }

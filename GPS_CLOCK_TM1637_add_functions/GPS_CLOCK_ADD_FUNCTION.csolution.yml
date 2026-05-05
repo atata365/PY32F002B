@@ -30,13 +30,7 @@ solution:
       target-set:
         - set:
           images:
-            - project-context: ADD_SEC_ALT_SPEED_HEADING.Debug
-            - project-context: ADD_SEC_ALT_SPEED.Debug
-            - project-context: ADD_SEC_ALT.Debug
-            - project-context: ADD_BRIGHTNESS_CHANGE.Debug
             - project-context: ADD_SEC.Debug
-            - project-context: ADD_SW.Debug
-            - project-context: BASE.Debug
 
   # List of different build configurations.
   build-types:

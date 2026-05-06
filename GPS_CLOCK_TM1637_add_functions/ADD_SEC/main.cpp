@@ -24,7 +24,7 @@
 #define max_touple_length 12
 #define modes 2
 #define avoid_chettring_time 500 // debounce time in milliseconds
-#define long_press_time 500 // long press duration in milliseconds 
+#define long_press_time 400 // long press duration in milliseconds 
 #define max_brightness 8 // maximum brightness level (for long press)
 /* voratile register for receive data buffer */
 volatile uint8_t received_data[buffer_size]; // buffer to store received data

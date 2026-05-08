@@ -583,10 +583,10 @@ int main() {
                 }
                 break;
             case 4:
-                /* display headding */
+                /* display heading */
                 if(get_a_line(work_buffer, work_buffer_size) > 0) { // get a line of data from the received data buffer
                     if(check_record_header((uint8_t *)"$GNVTG", work_buffer) == 6) { // check if the record is GNGGA
-                        i = get_toupe(work_buffer,touple_buffer,1); // get headding
+                        i = get_toupe(work_buffer,touple_buffer,1); // get heading
                         if(i >= 3) {
                             if(mode_changed) {
                                 col_data[0] = 16;

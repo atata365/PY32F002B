@@ -57,7 +57,7 @@ const uint8_t digit_code[] = {
     0b00000111, // 7
     0b01111111, // 8
     0b01100111, // 9
-    0b00000000, // 10:[BRANK]
+    0b00000000, // 10:[blank]
     0b01110111, // 11:A
     0b00111000, // 12:L
     0b01111000, // 13:t
@@ -494,7 +494,7 @@ int main() {
     col_data[1] = 18;
     col_data[2] = 18;
     col_data[3] = 18;
-    display_4_digit(col_data); 
+    display_4_digit(col_data); // display "----" on TM1637 at startup
     initSysTick(); // initialize SysTick for timing functions
     activate_EXTI(); // activate EXTI for mode change switch
     INIT_USART(); // initialize USART for receiving GPS data

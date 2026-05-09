@@ -151,13 +151,13 @@ void INIT_GPIOs() {
     GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD4_Msk) | GPIO_PUPDR_PUPD4_0;
     /* settings for GPIO PA6 */
     /* change PA6(TX) to multiplexed mode */
-    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE6_Msk) | GPIO_MODER_MODE6_1; 
+    //GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE6_Msk) | GPIO_MODER_MODE6_1; 
     /* change PA6(TX) to push-pull mode */
-    GPIOA->OTYPER |= GPIO_OTYPER_OT6;
+    //GPIOA->OTYPER |= GPIO_OTYPER_OT6;
     /* set PA6(TX) speed to very HIGH speed */
-    GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_0 | GPIO_OSPEEDR_OSPEED6_1;
+    //GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_0 | GPIO_OSPEEDR_OSPEED6_1;
     /* activate pull-up */
-    GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD6_Msk) | GPIO_PUPDR_PUPD6_0;
+    //GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD6_Msk) | GPIO_PUPDR_PUPD6_0;
     /* initialize GPIOB for TM1637 (PB0:clock , PB1:data) */
     /* set PB0 and PB1 to output mode */
     GPIOB->MODER = (GPIOB->MODER & ~(GPIO_MODER_MODE0_Msk | GPIO_MODER_MODE1_Msk))

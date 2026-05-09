@@ -572,7 +572,7 @@ int main() {
                                 mode_changed = false; // reset mode change flag
                             } else {
                                 for(j = 0;j < i;j++) if((touple_buffer[j]) == '.') break; // stop if decimal point is found
-                                i = 4 - j; // calculate number of digits to be displayed after decimal point
+                                i = 4 - j; // calculate number of digits to be displayed before decimal point
                                 for(j = 0;j < i;j++) col_data[j] = 10; // shift digits to the right
                                 j = 0; // index for digits to be displayed
                                 for(;i < 4;i++) col_data[i] = touple_buffer[j++] - '0'; // convert character to digit and store in column data buffer
@@ -597,7 +597,7 @@ int main() {
                                 mode_changed = false; // reset mode change flag
                             } else {
                                 for(j = 0;j < i;j++) if((touple_buffer[j]) == '.') break; // stop if decimal point is found
-                                i = 4 - j; // calculate number of digits to be displayed after decimal point
+                                i = 4 - j; // calculate number of digits to be displayed before decimal point
                                 for(j = 0;j < i;j++) col_data[j] = 10; // shift digits to the right
                                 j = 0; // index for digits to be displayed
                                 for(;i < 4;i++) col_data[i] = touple_buffer[j++] - '0'; // convert character to digit and store in column data buffer

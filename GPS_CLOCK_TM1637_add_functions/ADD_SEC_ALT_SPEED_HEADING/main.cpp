@@ -1,7 +1,7 @@
 /* minimum GPS clock */
-/* This program is maken for PY32F002B SOP14 package */
+/* This program is maken for PY32F002B SOP14 package. */
 /* receve GPS(NMEA) data from NEO-6M(or simular) and */
-/* display time to the TM1637 based 4-digit 7-segment display */ 
+/* display time to the TM1637 based 4-digit 7-segment display. */ 
 /* - USART settings - */
 /* fixed baud rate: 9600 bps */
 /* - connections -*/
@@ -12,8 +12,8 @@
 /* brightness change and mode cange switch connect to PA0 */
 /* port numbers are based on SOP14 package */
 /* - operation - */
-/* lon press the switch to change LED brightness */
-/* short press the switch to toggle display mode */
+/* long press the switch to change LED brightness */
+/* short press the switch to change display mode */
 /* mode 0: display hours and minutes */
 /* mode 1: display minutes and seconds */
 /* mode 2: display altitude */

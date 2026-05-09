@@ -30,7 +30,7 @@ solution:
       target-set:
         - set:
           images:
-            - project-context: ADD_SEC_ALT_SPEED.Debug
+            - project-context: ADD_SEC_ALT_SPEED_HEADING.Release
 
   # List of different build configurations.
   build-types:

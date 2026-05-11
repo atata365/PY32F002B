@@ -226,11 +226,11 @@ int get_toupe(uint8_t *source,uint8_t *dest,uint8_t num_touple) {
 void start_condition() {
     /* make start condition */
     /* reset PB1(data) */
-    GPIOB->BSRR |= GPIO_BSRR_BR1;
+    GPIOB->BSRR = GPIO_BSRR_BR1;
     /* wait */
     __NOP();
     /* reset PB0(clock) */
-    GPIOB->BSRR |= GPIO_BSRR_BR0;
+    GPIOB->BSRR = GPIO_BSRR_BR0;
     /* wait */
     __NOP();
 }
@@ -241,11 +241,11 @@ void start_condition() {
 void stop_condition() {
     /* make stop condition */
     /* set PB0(clock) */
-    GPIOB->BSRR |= GPIO_BSRR_BS0;
+    GPIOB->BSRR = GPIO_BSRR_BS0;
     /* wait */
     __NOP();
     /* set PB1(data) */
-    GPIOB->BSRR |= GPIO_BSRR_BS1;
+    GPIOB->BSRR = GPIO_BSRR_BS1;
     /* wait */
     __NOP();
 }
@@ -256,36 +256,36 @@ void stop_condition() {
 void send_data(uint8_t data){
     for(int i=0; i<8; i++){
         /* reset(LOW) PB0(clock) */
-        GPIOB->BSRR |= GPIO_BSRR_BR0;
+        GPIOB->BSRR = GPIO_BSRR_BR0;
         /* set or reset data bit(PB1) */
         if(data & 1){
             /* set PB1(data) */
-            GPIOB->BSRR |= GPIO_BSRR_BS1;
+            GPIOB->BSRR = GPIO_BSRR_BS1;
         } else {
             /* reset PB1(data) */
-            GPIOB->BSRR |= GPIO_BSRR_BR1;
+            GPIOB->BSRR = GPIO_BSRR_BR1;
         }
         /* wait */
         __NOP();
         /* set(HIGH) PB0(clock) */
-        GPIOB->BSRR |= GPIO_BSRR_BS0;
+        GPIOB->BSRR = GPIO_BSRR_BS0;
         /* wait for 100ms(HOLD time) */
         __NOP();
         data >>= 1;
     }
     /* reset PB0(clock) */
-    GPIOB->BSRR |= GPIO_BSRR_BR0;
+    GPIOB->BSRR = GPIO_BSRR_BR0;
     /* reset_PB1(data)*/
-    GPIOB->BSRR |= GPIO_BSRR_BR1;
+    GPIOB->BSRR = GPIO_BSRR_BR1;
     /* wait */
     __NOP();
     /* wait for ACK(discare ACK) */
     /* set PB0(clock) */
-    GPIOB->BSRR |= GPIO_BSRR_BS0;
+    GPIOB->BSRR = GPIO_BSRR_BS0;
     /* wait */
     __NOP();
     /* reset PB0(clock) */
-    GPIOB->BSRR |= GPIO_BSRR_BR0;
+    GPIOB->BSRR = GPIO_BSRR_BR0;
 }
 
 /*-----------------------------------------*/

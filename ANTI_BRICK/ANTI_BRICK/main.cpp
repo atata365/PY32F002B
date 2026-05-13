@@ -4,7 +4,7 @@
 int main() {
     /*+++++++++++++++++++++++ ANTI BRICK +++++++++++++++++++++++*/
     /*            ANTIBRICK avoids SWIO malfunctions.           */
-    /*  GPIO PA1 connect to GND at boot time. MCU will looping. */
+    /*  GPIO PA0 connect to GND at boot time. MCU will looping. */
     /*       When looping, can connect progrmmers to SWIO.      */
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /* activate HSI */
@@ -12,20 +12,20 @@ int main() {
     /* wait for HSI stabled */
     while (!(RCC->CR & RCC_CR_HSIRDY));
     RCC->IOPENR = RCC_IOPENR_GPIOAEN; // Enable GPIOA clock
-    /* set PA1 as input mode */
-    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE1);
-    /* pull-up PA1 */
-    GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD1) | GPIO_PUPDR_PUPD1_0;
-    /* when looping PA1 is 0(low) */
-    while(!(GPIOA->IDR & GPIO_IDR_ID1_Msk));
+    /* set PA0 as input mode */
+    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE0);
+    /* pull-up PA0 */
+    GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD0) | GPIO_PUPDR_PUPD0_0;
+    /* when looping PA0 is 0(low) */
+    while(!(GPIOA->IDR & GPIO_IDR_ID0));
     /*----- conclude ANTI BRICK -----*/
-    /* set PA0 to output mode */
-    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE0) | GPIO_MODER_MODE0_0;
-    /* set PA0 to push-pull mode */
-    GPIOA->OTYPER &= ~GPIO_OTYPER_OT0;
+    /* set PA1 to output mode */
+    GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE1) | GPIO_MODER_MODE1_0;
+    /* set PA1 to push-pull mode */
+    GPIOA->OTYPER &= ~GPIO_OTYPER_OT1;
 
     while (1) {
-        GPIOA->ODR ^= GPIO_ODR_OD0; // Toggle PA0
+        GPIOA->ODR ^= GPIO_ODR_OD1; // Toggle PA1
         for (volatile int i = 0; i < 500000; i++); // Delay
     }
 }

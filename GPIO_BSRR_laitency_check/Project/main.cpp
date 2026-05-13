@@ -16,7 +16,7 @@ void GPIOinit(){
     /* set PB0, PB1, PB2 to push-pull mode */
     GPIOB->OTYPER &= ~(GPIO_OTYPER_OT0 | GPIO_OTYPER_OT1 | GPIO_OTYPER_OT2);
     /* set PB0, PB1, PB2 to low */
-    GPIOB->BSRR |= GPIO_BSRR_BR0 | GPIO_BSRR_BR1 | GPIO_BSRR_BR2;
+    GPIOB->BSRR = GPIO_BSRR_BR0 | GPIO_BSRR_BR1 | GPIO_BSRR_BR2;
 }
 
 int main() {

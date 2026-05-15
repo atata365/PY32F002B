@@ -2,6 +2,7 @@
 #include CMSIS_device_header 
 
 #define MAX_CCR 249
+#define ARR_VAL 250
 #define MAX_LOOPS 2
 
 volatile bool DIRECTION;    // true=increment,false=decrement
@@ -9,8 +10,7 @@ volatile uint8_t CCR_VALUE; // capture compare register value
 volatile uint8_t LOOPS;     // loops in same CCR 
 
 /* TIM1 Break, Update, Trigger and Commutation Interrupt Handler (IRQn=13) */
-extern "C" 
-    __attribute__((interrupt)) void TIM1_BRK_UP_TRG_COM_IRQHandler(void) {
+extern "C" void TIM1_BRK_UP_TRG_COM_IRQHandler(void) {
     /* clear update interrupt flag */
     TIM1->SR &= ~TIM_SR_UIF;
     /* turn on the LED at PA0 */
@@ -34,8 +34,7 @@ extern "C"
 }
 
 /* TIM1 Capture Compare Interrupt Handler (IRQn=14) */
-extern "C"
-    __attribute__((interrupt)) void TIM1_CC_IRQHandler(void) {
+extern "C" void TIM1_CC_IRQHandler(void) {
     /* clear capture compare interrupt flag */
     TIM1->SR &= ~TIM_SR_CC1IF;
     /* turn off the LED at PA0 */
@@ -69,6 +68,8 @@ void TIM1init() {
     TIM1->CR1 = TIM_CR1_CEN;
     /* activate TIM1 BRK_UP_TRG_COM and CC1 interrupt */
     TIM1->DIER |= TIM_DIER_UIE | TIM_DIER_CC1IE;
+    /* set counter MAX */
+    TIM1->ARR = ARR_VAL;
     /* enable interrupts in NVIC */
     NVIC->ISER[0] = (1 << TIM1_BRK_UP_TRG_COM_IRQn) | (1 << TIM1_CC_IRQn);
 }

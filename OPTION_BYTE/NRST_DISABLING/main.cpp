@@ -23,7 +23,7 @@ int main() {
     /*+++++++++++++++++++++++ ANTI BRICK +++++++++++++++++++++++*/
     /*            ANTIBRICK avoids SWIO malfunctions.           */
     /*  GPIO PA0 connect to GND at boot time. MCU will looping. */
-    /*       When looping, can connect progrmmers to SWIO.      */
+    /*       When looping, can connect programmer to SWIO.      */
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /* activate HSI */
     RCC->CR = RCC_CR_HSION; // Enable HSI
@@ -63,7 +63,7 @@ int main() {
     FLASH->OPTKEYR = FLASH_OPTKEY2;
     /* wait for clear busy bit */
     while (FLASH->SR & FLASH_SR_BSY);
-    /* reset NRST bit(disable NRST,PC0 as GPIO) */
+    /* set NRST bit(disable NRST,PC0 as GPIO) */
     FLASH->OPTR |= FLASH_OPTR_NRST_MODE;
     /* start write OPTION BYTE */
     FLASH->CR |= FLASH_CR_OPTSTRT;
@@ -74,12 +74,12 @@ int main() {
     while (FLASH->SR & FLASH_SR_BSY);
     /* wait for write completes successfully.*/
     while ((FLASH->SR & FLASH_SR_EOP) != 0);
-    /* slow blink LED at PC0 100 times */
+    /* slow blink LED at PC0 10 times */
     for(j = 0;j < 10;j++){
         GPIOA->ODR ^= GPIO_ODR_OD1; // Toggle PA1
         for (i = 0; i < 600000; i++); // Delay
     }
-    /* restart MCU for transfer setting from FLASH->OPTR to OB->USER */
+    /* restart MCU for refresh FLASH->OPTR */
     FLASH->CR |= FLASH_CR_OBL_LAUNCH;
     while(1);
 }

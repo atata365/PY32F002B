@@ -23,7 +23,7 @@ int main() {
     /*+++++++++++++++++++++++ ANTI BRICK +++++++++++++++++++++++*/
     /*            ANTIBRICK avoids SWIO malfunctions.           */
     /*  GPIO PA0 connect to GND at boot time. MCU will looping. */
-    /*       When looping, can connect progrmmers to SWIO.      */
+    /*       When looping, can connect programmer to SWIO.      */
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /* activate HSI */
     RCC->CR = RCC_CR_HSION; // Enable HSI
@@ -79,7 +79,7 @@ int main() {
         GPIOA->ODR ^= GPIO_ODR_OD1; // Toggle PA1
         for (i = 0; i < 600000; i++); // Delay
     }
-    /* restart MCU for transfer setting from FLASH->OPTR to OB->USER */
+    /* restart MCU for refresh FLASH->OPTR */
     FLASH->CR |= FLASH_CR_OBL_LAUNCH;
     while(1);
 }

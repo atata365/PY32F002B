@@ -30,11 +30,7 @@ solution:
       target-set:
         - set:
           images:
-            - project-context: SMOOTH_BLINK_LED.Debug
-          debugger:
-            name: CMSIS-DAP@pyOCD
-            clock: 10000000
-            protocol: swd
+            - project-context: Project.Debug
 
   # List of different build configurations.
   build-types:
@@ -48,5 +44,5 @@ solution:
 
   # List related projects.
   projects:
-    - project: SMOOTH_BLINK_LED/SMOOTH_BLINK_LED.cproject.yml
+    - project: Project/Project.cproject.yml
   compiler: AC6

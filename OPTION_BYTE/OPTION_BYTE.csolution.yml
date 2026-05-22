@@ -29,12 +29,12 @@ solution:
       device: PY32F002Bx5
       target-set:
         - set:
-          images:
-            - project-context: SMOOTH_BLINK_LED.Debug
           debugger:
             name: CMSIS-DAP@pyOCD
             clock: 10000000
             protocol: swd
+          images:
+            - project-context: NRST_ENABLING.Debug
 
   # List of different build configurations.
   build-types:
@@ -48,5 +48,6 @@ solution:
 
   # List related projects.
   projects:
-    - project: SMOOTH_BLINK_LED/SMOOTH_BLINK_LED.cproject.yml
+    - project: NRST_ENABLING/NRST_ENABLING.cproject.yml
+    - project: NRST_DISABLING/NRST_DISABLING.cproject.yml
   compiler: AC6

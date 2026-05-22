@@ -47,8 +47,8 @@ int main() {
         GPIOA->ODR ^= GPIO_ODR_OD2; // Toggle PA2
         for (volatile int i = 0; i < 500000; i++); // Delay
     }
-    /* activate SWDIO(normary operation) */
-    /* set PA2(SWC) and PB6(SWD) to AlternateFunction mode */
+    /* activate SWDIO(normally operation) */
+    /* set PA2(SWC) and PB6(SWD) to Alternate Function mode */
     /* set PA2(SWC) to pull-downed alternate function mode*/
     GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE2) | GPIO_MODER_MODE2_1; // AF mode
     GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD2) | GPIO_PUPDR_PUPD2_1; // pull-down

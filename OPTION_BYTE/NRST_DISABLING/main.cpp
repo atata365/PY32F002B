@@ -74,7 +74,7 @@ int main() {
     while (FLASH->SR & FLASH_SR_BSY);
     /* wait for write completes successfully.*/
     while ((FLASH->SR & FLASH_SR_EOP) != 0);
-    /* slow blink LED at PC0 10 times */
+    /* slow blink LED at PA0 10 times */
     for(j = 0;j < 10;j++){
         GPIOA->ODR ^= GPIO_ODR_OD1; // Toggle PA1
         for (i = 0; i < 600000; i++); // Delay

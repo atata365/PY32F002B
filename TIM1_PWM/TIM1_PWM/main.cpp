@@ -6,14 +6,15 @@ void TIM1init() {
     RCC->APBENR2 |= RCC_APBENR2_TIM1EN;
     /* prescaler (make counter freq) */
     /* 0..65535(16bit) */
-    /* (24000000(24MHz) / 4800) = 5kHz */    
+    /* (24000000(24MHz) / 4800) = 5kHz */
+    /* set actual value -1 (4800-1=4799)*/    
     TIM1->PSC = 4799;
     /* ARR(Auto Reload Resister) = 0..65535(16bit) */ 
-    /* 5kHz/5000=1Hz */
+    /* 5kHz/5000=1Hz (set actual value -1:5000-1=4999)*/
     TIM1->ARR = TIM_ARR_ARR_Msk & 4999;
     /* CCR1 = 0..65535(16bit) */ 
-//    TIM1->CCR1 = 2499;// duty 50%
-    TIM1->CCR1 = 2499;// duty 50%
+    /* 5kHz/5000=1Hz, duty 50% (set actual value here:2500)*/
+    TIM1->CCR1 = 2500;// duty 50%
     /* set PWM mode */
     /* PWM mode 1 , activate preload*/
     TIM1->CCMR1 = (TIM1->CCMR1 & ~TIM_CCMR1_OC1M)

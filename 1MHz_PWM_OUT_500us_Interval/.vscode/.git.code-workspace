@@ -1,0 +1,95 @@
+{
+	"folders": [
+		{
+			"path": "../../.git"
+		},
+		{
+			"path": "../../8DIGIT_LED_HC595x2"
+		},
+		{
+			"path": "../../ANTI_BRICK"
+		},
+		{
+			"path": "../../BLINK_LED_PC0"
+		},
+		{
+			"path": "../../BLINK_LED_PC0_PA2_PB6"
+		},
+		{
+			"path": "../../CLOCK_SOURCE"
+		},
+		{
+			"path": "../../GET_GPS_TOUPLE"
+		},
+		{
+			"path": "../../GPIO_BSRR_laitency_check"
+		},
+		{
+			"path": "../../GPIO_INTERRUPT"
+		},
+		{
+			"path": "../../GPS_CLOCK_TM1637"
+		},
+		{
+			"path": "../../GPS_CLOCK_TM1637_add_functions"
+		},
+		{
+			"path": "../../Make500kHzPULSE"
+		},
+		{
+			"path": "../../OPTION_BYTE"
+		},
+		{
+			"path": "../../SMOOTH_BLINK_LED"
+		},
+		{
+			"path": "../../SWIO_OFF"
+		},
+		{
+			"path": "../../SysTick"
+		},
+		{
+			"path": "../../test"
+		},
+		{
+			"path": "../../TIM1_INTERRUPT"
+		},
+		{
+			"path": "../../TIM1_PWM"
+		},
+		{
+			"path": "../../TIM14_INTERRUPT"
+		},
+		{
+			"path": "../../TIM14_PWM"
+		},
+		{
+			"path": "../../TM1637"
+		},
+		{
+			"path": "../../TM1637_NO_TIMER"
+		},
+		{
+			"path": "../../UART_REPEATER"
+		},
+		{
+			"path": "../../USART_REPEATER_interrupt"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../1MHz_PWM_OUTPUT"
+		},
+		{
+			"path": "../../USART_REPEAT_SPECIFIED_RECORD"
+		}
+	],
+	"settings": {
+		"debug.hideSlowPreLaunchWarning": true,
+		"debug.showInStatusBar": "never",
+		"clangd.arguments": [
+			"--compile-commands-dir=c:\\Users\\kfuji\\KeilStudio\\PY32F002B\\1MHz_PWM_OUTPUT\\out\\Project\\PY32F002Bx5\\Debug"
+		]
+	}
+}

@@ -36,6 +36,7 @@ void Init_SysTick(void) {
     /* 11999 = (24000000 / 2000) - 1 */
     /* max 24bit = 16777215 = 0.699Hz */
     //SysTick->LOAD = 11999;
+    /* set 24000000/880 - 1 -> 440Hz */
     SysTick->LOAD = 27271;
     /* clear current counter value */
     SysTick->VAL  = 0;

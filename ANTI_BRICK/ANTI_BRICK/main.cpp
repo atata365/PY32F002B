@@ -5,7 +5,7 @@ int main() {
     /*+++++++++++++++++++++++ ANTI BRICK +++++++++++++++++++++++*/
     /*            ANTIBRICK avoids SWIO malfunctions.           */
     /*  GPIO PA0 connect to GND at boot time. MCU will looping. */
-    /*       When looping, can connect progrmmers to SWIO.      */
+    /*       When looping, can connect programmer to SWIO.      */
     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
     /* activate HSI */
     RCC->CR = RCC_CR_HSION; // Enable HSI

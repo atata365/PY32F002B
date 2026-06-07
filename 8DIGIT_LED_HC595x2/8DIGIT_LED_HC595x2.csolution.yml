@@ -32,6 +32,10 @@ solution:
           images:
             - project-context: Project.Debug
               load: image
+          debugger:
+            name: ST-Link@pyOCD
+            clock: 1000000
+            protocol: swd
 
   # List of different build configurations.
   build-types:

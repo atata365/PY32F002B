@@ -1,0 +1,7 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=c:\\Users\\kfuji\\KeilStudio\\PY32F002B\\Broadcast1MHz_440Hz_A1Moduration\\out\\Project\\PY32F002Bx5\\Debug"
+    ],
+    "debug.hideSlowPreLaunchWarning": true,
+    "debug.showInStatusBar": "never"
+}

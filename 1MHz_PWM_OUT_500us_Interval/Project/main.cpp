@@ -13,7 +13,7 @@
 #include "RTE_Components.h"
 #include CMSIS_device_header
 
-volatile int flag = 0;
+volatile int flag = 0; // flag for switching duty 12/0 in SysTick_Handler
 /*---------------------------------------*/
 /* excetion process routuine for SysTick */
 /* This routine called every 1ms.        */

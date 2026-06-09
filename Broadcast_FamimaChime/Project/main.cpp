@@ -75,9 +75,7 @@ void delay(uint32_t Wait_ms) {
 /*-----------------------------------*/
 extern "C" {
     void TIM14_IRQHandler(void) {
-        /* check if the interrupt is from the update event */
-        if ((flag) || (mute)) TIM1->CCR1 = 12;   // duty 50%(ON):start output
-        else TIM1->CCR1 = 0;    // duty 0%(OFF):stop output
+        ((flag) || (mute)) ? TIM1->CCR1 = 12 : TIM1->CCR1 = 0;
         flag = !flag;   // toggle flag
         /* clear interrupt flag */
         TIM14->SR &= ~TIM_SR_UIF;
@@ -173,13 +171,11 @@ void Init_TIM14(void) {
 /* output tone */
 /*-------------*/
 void tone(int interval,int length) {
-    if (interval == 0) {
-        mute = true;
-    } else {
-        mute = false;
-    }
+    interval == 0 ? mute = true : mute = false;
     TIM14->ARR = interval - 1;  // setting value is actial value -1
     delay(length);
+    /* clear counter */
+    TIM14->CNT = 0;
 }
 
 /*-----------------------*/

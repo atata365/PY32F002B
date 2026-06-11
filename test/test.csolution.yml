@@ -31,10 +31,6 @@ solution:
         - set:
           images:
             - project-context: Project.Debug
-          debugger:
-            name: CMSIS-DAP@pyOCD
-            clock: 10000000
-            protocol: swd
 
   # List of different build configurations.
   build-types:

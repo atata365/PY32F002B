@@ -495,13 +495,19 @@ int main() {
     CLEAR_SCREEN();
     VREVERSE_ST7567(false);
     HREVERSE_ST7567(false);
-    SETRR_ST7567(3);
+    SETRR_ST7567(4);
     
     //PUT_CHR('A');
+    SET_CURSOR(3,16);
     SET_MAG(2, 1);
-    PUT_STR((char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    SET_CURSOR(4,0);
-    PUT_STR((char *)"abcdefghijklmnopqrstuvwxyz");
+    PUT_STR((char *)"Hello World!");
+    //SET_CURSOR(4,0);
+    //PUT_STR((char *)"abcdefghijklmnopqrstuvwxyz");
+    //SET_MAG(8, 7);
+    //SET_CURSOR(1,12);
+    //PUT_STR((char *)"abcdefghijklmnopqrstuvwxyz");
+    //PUT_CHR('A');
+    //PUT_CHR('S');
     
     while (1) {
         BACK_LIGHT(true);

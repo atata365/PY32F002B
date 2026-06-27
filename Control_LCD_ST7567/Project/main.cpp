@@ -16,26 +16,24 @@
 
 /* Horizontal gap is horizon mem size - display size */
 #define H_gap 132 - 128
+/* Pages and columns */
+#define MAX_PAGE 8
+#define MAX_COL 128
 
 /* Global valiables */
 volatile uint32_t L;    // SysTick counter
 volatile uint8_t CUR_PAGE;  // Current page
 volatile uint8_t CUR_COL;   // Current column
 volatile bool HREVERSE_status = false;
-
-/* working valiables(internaly used) */
-#define MAX_PAGE 8
-#define MAX_COL 128
-
-uint8_t NextPage;
-uint8_t NextCol;
-uint8_t CurH_mag = 1;
-uint8_t CurV_mag = 1;
+volatile uint8_t NextPage;
+volatile uint8_t NextCol;
+volatile uint8_t CurH_mag = 1;
+volatile uint8_t CurV_mag = 1;
 
 /* Character font data */
-/*----------------------------*/
-/* font data for OLED display */
-/*----------------------------*/
+/*---------------------------*/
+/* font data for LCD display */
+/*---------------------------*/
 #define UPPERCASE
 #define LOWERCASE
 #define EXT_CHR
@@ -146,10 +144,10 @@ const char font_chr[][7] = {
 #endif
 };
 
-/*---------------------------------------*/
-/* excetion process routuine for SysTick */
-/* This routine called every 1ms.        */
-/*---------------------------------------*/
+/*----------------------------------------*/
+/* Excetion process routuine for SysTick. */
+/* This routine called every 1ms.         */
+/*----------------------------------------*/
 extern "C" {
     void SysTick_Handler(void) {
         L++;
@@ -157,8 +155,7 @@ extern "C" {
 }
 
 /*-------------------------------------*/
-/* initSysTick                         */
-/* start SysTick interrupt and counter */
+/* Initialize and start SysTick timer. */
 /*-------------------------------------*/
 void INIT_SysTick(void) {
     /* load value (sys_clk(24MHz) / 1000(1ms)) - 1 */
@@ -181,10 +178,16 @@ void INIT_SysTick(void) {
                     SysTick_CTRL_ENABLE_Msk;
 }
 
+/*----------------------------*/
+/* Return with SysTick count. */
+/*----------------------------*/
 uint32_t millis(void) {
     return L;
 }
 
+/*---------------------------------------------*/
+/* Blocking that waits for the specified time. */
+/*---------------------------------------------*/
 void delay(uint32_t Wait_ms) {
     volatile uint32_t end_ms;
     end_ms = millis() + Wait_ms;
@@ -286,18 +289,23 @@ void INIT_USART(void) {
     USART1->CR1 |= USART_CR1_UE |USART_CR1_TE | USART_CR1_RE;
 }
 
+/*-----------------------------------*/
+/* Initialize and startup SPI module */
+/*-----------------------------------*/
 void INIT_SPI(void){
+    /* Turn on the SPI module */
     RCC->APBENR2|= RCC_APBENR2_SPI1EN;
      /* set SPI1 to master mode, full duplex, 8-bit data frame, clock polarity low, clock phase first edge */
     //SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM | SPI_CR1_BR_0 | SPI_CR1_BR_1;
     /* SPI clock rate=fPClk/2(BR0,BR1,BR2 as 0) (MAX speed) */
     SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM;
-    /* enable SPI1 (Note: Do this opertion shuld be separatly) */
+    /* Startup SPI interface. (Note: This operation should be done separately.) */
     SPI1->CR1 |= SPI_CR1_SPE;
-    /* Turn on the backllight (PA1->LOW) */
-    GPIOA->BSRR = GPIO_BSRR_BR1;
 }
 
+/*------------------------------------------------*/
+/* Send one byte data without C/D signal control. */
+/*------------------------------------------------*/
 void SPI_Transmit(uint8_t code) {
     /* wait until transmit buffer is empty */
     while (!(SPI1->SR & SPI_SR_TXE));
@@ -307,57 +315,88 @@ void SPI_Transmit(uint8_t code) {
     while (SPI1->SR & SPI_SR_BSY);
 }
 
+/*------------------------------------------------*/
+/* Send one byte command with C/D signal control. */
+/*------------------------------------------------*/
 void SEND_CMD(uint8_t cmd) {
     /* set Cmd/Dat pin LOW for command */
     GPIOB->BSRR = GPIO_BSRR_BR1;
     SPI_Transmit(cmd);
 }
 
+/*---------------------------------------------*/
+/* Send one byte data with C/D signal control. */
+/*---------------------------------------------*/
 void SEND_DATA(uint8_t data) {
     /* set Cmd/Dat pin HIGH for data */
     GPIOB->BSRR = GPIO_BSRR_BS1;
     SPI_Transmit(data);
 }
 
+/*--------------------*/
+/* Do hardware reset. */
+/*--------------------*/
 void HW_RESET_ST7567(void) {
     /* Reset the LCD */
     GPIOB->BSRR = GPIO_BSRR_BR2; // Set Reset pin LOW
-    delay(10); // Wait for 10 ms
+    delay(1); // Wait for 1 ms
     GPIOB->BSRR = GPIO_BSRR_BS2; // Set Reset pin HIGH
-    delay(10); // Wait for 10 ms
+    delay(1); // Wait for 1 ms
 }
 
+/*--------------------*/
+/* Do software reset. */
+/*--------------------*/
 void SW_RESET_ST7567(void) {
     /* Soft reset the LCD */
     SEND_CMD(0xE2); // Soft reset command
     delay(10); // Wait for 10 ms
 }
 
+/*-----------------*/
+/* Switch display. */
+/*-----------------*/
+/* true:enavle display false:display tempolary off */
 void SW_ST7567(bool SW) {
     SW ? SEND_CMD(0xAF) : SEND_CMD(0xAE); // Display ON/OFF
 }
 
-/* Set display direction */
-/* true:upside downn, false:normly */
+/*---------------------------------*/
+/* Set display virtical direction. */
+/*---------------------------------*/
+/* true:upside downn, false:normaly */
 void VREVERSE_ST7567(bool dir) {
     dir ? SEND_CMD(0xC0) : SEND_CMD(0xC8);
 }
 
-/* true:upside downn, false:normly */
+/*-----------------------------------*/
+/* Set display horizontal direction. */
+/*-----------------------------------*/
+/* false:display left to right, true:display right to left */
 void HREVERSE_ST7567(bool dir) {
     dir ? SEND_CMD(0xA1) : SEND_CMD(0xA0);
     HREVERSE_status = dir;
 }
 
+/*------------------------------------------------------*/
+/* Set negative display(true) or normal display(false). */
+/*------------------------------------------------------*/
 void INVERSE_ST7567(bool inverse) {
     inverse ? SEND_CMD(0xA7) : SEND_CMD (0xA6); // Inverse display or Normal display
 }
 
+/*---------------------------------*/
 /* Set reguration ratio (contrast) */
+/*---------------------------------*/
+/* RR value can set 0 to 7 */
+/* Reecomend value is 4 */
 void SETRR_ST7567(uint8_t RR) {
     SEND_CMD(0x20 + (RR & 0x7));
 }
 
+/*------------------------------------*/
+/* Initialize ST7567 based LCD panel. */
+/*------------------------------------*/
 void INIT_ST7567(){
     /* Reset the LCD */
     HW_RESET_ST7567();
@@ -378,20 +417,33 @@ void INIT_ST7567(){
     SW_ST7567(true); // Display ON
 }
 
+/*--------------------------------------------*/
+/* Turn on or off the backlight of LCD panel. */
+/*--------------------------------------------*/
+/* Turn off(false) or turn on(true) the backlight. */
 void BACK_LIGHT(bool light_on){
     light_on ? GPIOA->BSRR = GPIO_BSRR_BR1 : GPIOA->BSRR = GPIO_BSRR_BS1;
 }
 
+/*--------------------------------------*/
+/* Set page(vertical position). (0...7) */
+/*--------------------------------------*/
 void SET_PAGE(uint8_t page) {
     SEND_CMD(0xB0 | (page & 0x07)); // Set page address
 }
 
+/*--------------------------------------------*/
+/* Set column(horizontal position). (0...127) */
+/*--------------------------------------------*/
 void SET_COLUMN(uint8_t column) {
     if(HREVERSE_status) column += H_gap;
     SEND_CMD(0x10 | ((column >> 4) & 0x0F)); // Set column address (high nibble)
     SEND_CMD(0x00 | (column & 0x0F)); // Set column address (low nibble)
 }
 
+/*--------------------------------------------*/
+/* Set cursor position for put the character. */
+/*--------------------------------------------*/
 void SET_CURSOR(uint8_t page, uint8_t column) {
     SET_PAGE(page);
     SET_COLUMN(column);
@@ -399,6 +451,9 @@ void SET_CURSOR(uint8_t page, uint8_t column) {
     NextCol = column;
 }
 
+/*-----------------------------------------------------*/
+/* Clear LCD screen and set cursor position to origin. */
+/*-----------------------------------------------------*/
 void CLEAR_SCREEN(void) {
     for (uint8_t i = 0; i < 8; i++) {
         SET_PAGE(i); 
@@ -411,16 +466,20 @@ void CLEAR_SCREEN(void) {
     NextCol = 0;
 }
 
-
+/*-------------------------*/
+/* Set magnifucation rate. */
+/*-------------------------*/
+/* V_mag as 1 to 8 */
+/* H_mag as 1 to 16 */ 
 void SET_MAG(uint8_t V_mag, uint8_t H_mag) {
     CurV_mag = V_mag;
     CurH_mag = H_mag;
 }
 
 /*---------------------------------------------*/
-/* putChr: put a character on current position */
-/*               current position to be update */
+/* Put a character on current cursor position. */
 /*---------------------------------------------*/
+/* Cursor position will be updated */
 void PUT_CHR(uint8_t chr) {
     uint32_t work, ext_work;
     uint16_t dot_pos, i, j, k;
@@ -471,9 +530,11 @@ void PUT_CHR(uint8_t chr) {
     /* next page will reset to 0 if next page will be 0 */
     if (NextPage >= MAX_PAGE) NextPage = 0;
 }
-/*--------------------------------------------*/
-/* putStr: put characters on current position */
-/*--------------------------------------------*/
+
+/*------------------------------------------*/
+/* Put stringth on current cursor position. */
+/*------------------------------------------*/
+/* Cursor position will be updated */
 void PUT_STR(char str[]) {
     int i = 0;
     while (str[i]) {
@@ -481,8 +542,6 @@ void PUT_STR(char str[]) {
         i++;
     }
 }
-/* private functions */
-
 
 int main() {
     uint8_t i;

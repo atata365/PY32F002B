@@ -6,6 +6,6 @@
     "memory-inspector.groupings.MAUsPerGroup": 4,
     "memory-inspector.scrollingBehavior": "Auto-Append",
     "clangd.arguments": [
-        "--compile-commands-dir=/home/kfujii/ドキュメント/keilstudio/PY32F002B/Control_OLED_SSD1306/out/Project/PY32F002Bx5/Debug"
+        "--compile-commands-dir=/home/kfujii/ドキュメント/KeilStudio/PY32F002B/Control_OLED_SSD1306/out/Project/PY32F002Bx5/Debug"
     ]
 }

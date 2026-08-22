@@ -13,6 +13,8 @@
 #include "py32f002bx5.h"
 #include CMSIS_device_header
 
+#define SSD1306_ADDR 0x3C
+
 /* Horizontal gap is horizon mem size - display size */
 #define H_gap 132 - 128
 /* Pages and columns */
@@ -205,10 +207,10 @@ void INIT_GPIOs(void) {
   /* Setting GPIOs for I2C */
   /* set alternate function I2C */
   /* set PA2 to AF6 (I2C_SCL) */
-  GPIOA->AFR[0] = (GPIOA->AFR[0] & ~GPIO_AFRL_AFSEL2_Msk) GPIO_AFRL_AFSEL2_2 |
+  GPIOA->AFR[0] = (GPIOA->AFR[0] & ~GPIO_AFRL_AFSEL2_Msk) | GPIO_AFRL_AFSEL2_2 |
                   GPIO_AFRL_AFSEL2_1;
   /* set PB6 to AF6 (I2C_SDA) */
-  GPIOB->AFR[0] = (GPIOB->AFR[0] & ~GPIO_AFRL_AFSEL6_Msk) GPIO_AFRL_AFSEL6_2 |
+  GPIOB->AFR[0] = (GPIOB->AFR[0] & ~GPIO_AFRL_AFSEL6_Msk) | GPIO_AFRL_AFSEL6_2 |
                   GPIO_AFRL_AFSEL6_1;
 
   /* settings for GPIO PA2(I2C_SCL) */
@@ -248,6 +250,38 @@ void INIT_GPIOs(void) {
   GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_0 | GPIO_OSPEEDR_OSPEED6_1;
   /* activate pull-up */
   GPIOA->PUPDR = (GPIOA->PUPDR & ~GPIO_PUPDR_PUPD6_Msk) | GPIO_PUPDR_PUPD6_0;
+
+  /* Settings for GPIO PA1(used for debug LED) */
+  /* Set PA1 to output mode */
+  GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE1_Msk) | GPIO_MODER_MODE1_0;
+  /* Set PA1 to push-pull mode */
+  GPIOA->OTYPER &= ~GPIO_OTYPER_OT1;
+  /* Set PA1 speed to very LOW speed */
+  GPIOA->OSPEEDR &= ~(GPIO_OSPEEDR_OSPEED1_0 | GPIO_OSPEEDR_OSPEED1_1);
+  /* Set PA1 to no pull-up/pull-down */
+  GPIOA->PUPDR &= ~GPIO_PUPDR_PUPD1_Msk;
+}
+
+/*----------------------------------*/
+/* Reset PA2 and PB6 as SWC and SWD */
+/*----------------------------------*/
+void RESET_SWD() {
+  /* set PA2 to AF0 (SWC) */
+  GPIOA->AFR[0] = 0;
+  /* set PB6 to AF0 (SWD) */
+  GPIOB->AFR[0] = 0;
+  /* settings for GPIO PA2(SWC) */
+  /* set PA2(SWC) to alternate function mode */
+  GPIOA->MODER = 0x0000FFEF;
+  GPIOA->OTYPER = 0x00000000;
+  GPIOA->OSPEEDR = 0x00000000;
+  GPIOA->PUPDR = 0x00000020;
+  /* settings for GPIO PB6(SWD) */
+  /* set PB6(SWD) to analog mode */
+  GPIOB->MODER = 0x0000EFFF;
+  GPIOB->OTYPER = 0x00000000;
+  GPIOB->OSPEEDR = 0x00003000;
+  GPIOB->PUPDR = 0x00001000;
 }
 
 /*-------------------*/
@@ -272,281 +306,152 @@ void INIT_USART(void) {
 /*-----------------------------------*/
 /* Initialize and startup I2C module */
 /*-----------------------------------*/
-void INIT_SPI(void) {
-  /* Turn on the SPI module */
+void INIT_I2C(void) {
+  /* Turn on the I2C module */
   RCC->APBENR1 |= RCC_APBENR1_I2CEN;
   /* Set I2C mode(FM+) to I2C_SCL(PA2)*/
   SYSCFG->CFGR1 |= SYSCFG_CFGR1_I2C_PA2_FMP;
   /* Set I2C mode(FM+) to I2C_SDA(PB6)*/
   SYSCFG->CFGR1 |= SYSCFG_CFGR1_I2C_PB6_FMP;
   /* start I2C I/F */
-  I2C->CR1 |= I2C_CR1_START;
-  /* Set I2C timimgs */
-  I2C->CCR;
-  I2C->TRISE;
+  I2C1->CR1 |= I2C_CR1_START;
+
+  /* Set I2C F/S(SM->0,FM->1),CCR_DUTY(2;1->0 or 16:9->1),CCR */
+  /* CCR value:SM(duty 1:1)=24*10^6 / 2 * (100*10^3) =  120 */
+  /*           FM(duty 2:1)=24*10^6 / 3 * (400*10^3) =   20 */
+  /*           FM(duty16:9)=24*10^6 / 25 * (400*10^3) =   2.4->2 */
+  I2C1->CCR = I2C_CCR_FS | 20;
+  /* TRISE=1000ns(SM),300ns(FM) */
+  /* Setting Value:24*16^6 * 300*10^-9 + 1 = 8.2-->8 */
+  I2C1->TRISE = 8;
 
   /* I2C enable */
   I2C1->CR1 |= I2C_CR1_PE;
   I2C1->CR1 |= I2C_CR1_START;
-
-  /* set SPI1 to master mode, full duplex, 8-bit data frame, clock polarity low,
-   * clock phase first edge */
-  // SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM | SPI_CR1_BR_0 |
-  // SPI_CR1_BR_1;
-  /* SPI clock rate=fPClk/2(BR0,BR1,BR2 as 0) (MAX speed) */
-  SPI1->CR1 = SPI_CR1_MSTR | SPI_CR1_SSI | SPI_CR1_SSM;
-  /* Startup SPI interface. (Note: This operation should be done separately.) */
-  SPI1->CR1 |= SPI_CR1_SPE;
 }
 
-/*------------------------------------------------*/
-/* Send one byte data without C/D signal control. */
-/*------------------------------------------------*/
-void SPI_Transmit(uint8_t code) {
-  /* wait until transmit buffer is empty */
-  while (!(SPI1->SR & SPI_SR_TXE))
-    ;
-  /* send data */
-  SPI1->DR = code;
-  /* wait until transmission is complete */
-  while (SPI1->SR & SPI_SR_BSY)
+/*--------------------------*/
+/* Generate start condition */
+/*--------------------------*/
+void I2C_START_CONDITION() {
+  I2C1->CR1 |= I2C_CR1_START;
+  while (!(I2C1->SR1 & I2C_SR1_SB))
     ;
 }
 
-/*------------------------------------------------*/
-/* Send one byte command with C/D signal control. */
-/*------------------------------------------------*/
-void SEND_CMD(uint8_t cmd) {
-  /* set Cmd/Dat pin LOW for command */
-  GPIOB->BSRR = GPIO_BSRR_BR1;
-  SPI_Transmit(cmd);
+/*-------------------------*/
+/* Generate stop condition */
+/*-------------------------*/
+void I2C_STOP_CONDITION() {
+  I2C1->CR1 |= I2C_CR1_STOP;
+  while (I2C1->SR1 & I2C_SR1_SB)
+    ;
 }
 
-/*---------------------------------------------*/
-/* Send one byte data with C/D signal control. */
-/*---------------------------------------------*/
-void SEND_DATA(uint8_t data) {
-  /* set Cmd/Dat pin HIGH for data */
-  GPIOB->BSRR = GPIO_BSRR_BS1;
-  SPI_Transmit(data);
+/*-------------------------------------*/
+/* Check address was receveed by slave */
+/*-------------------------------------*/
+void I2C_WAIT_ACK() {
+  while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    ;
+  (void)I2C1->SR2; // Clear ADDR flag by reading SR2
 }
 
-/*--------------------*/
-/* Do hardware reset. */
-/*--------------------*/
-void HW_RESET_ST7567(void) {
-  /* Reset the LCD */
-  GPIOB->BSRR = GPIO_BSRR_BR2; // Set Reset pin LOW
-  delay(1);                    // Wait for 1 ms
-  GPIOB->BSRR = GPIO_BSRR_BS2; // Set Reset pin HIGH
-  delay(1);                    // Wait for 1 ms
+/*-----------------------*/
+/* Send one byte of data */
+/*-----------------------*/
+void I2C_SEND_BYTE(uint8_t data) { I2C1->DR = data; }
+
+/*---------------------------------*/
+/* Wait for stop condition detected*/
+/* --for slave mode--              */
+/*---------------------------------*/
+void I2C_WAIT_STOP() {
+  while (I2C1->CR1 & I2C_CR1_STOP)
+    ;
 }
 
-/*--------------------*/
-/* Do software reset. */
-/*--------------------*/
-void SW_RESET_ST7567(void) {
-  /* Soft reset the LCD */
-  SEND_CMD(0xE2); // Soft reset command
-  delay(10);      // Wait for 10 ms
-}
-
-/*-----------------*/
-/* Switch display. */
-/*-----------------*/
-/* true:enavle display false:display tempolary off */
-void SW_ST7567(bool SW) {
-  SW ? SEND_CMD(0xAF) : SEND_CMD(0xAE); // Display ON/OFF
+/*-----------------------------*/
+/* Wait for I2C bus to be free */
+/*-----------------------------*/
+void I2C_WAIT_BUSY() {
+  while (I2C1->SR2 & I2C_SR2_BUSY)
+    ;
 }
 
 /*---------------------------------*/
-/* Set display virtical direction. */
+/* Wait for transmit buffer empty */
 /*---------------------------------*/
-/* true:upside downn, false:normaly */
-void VREVERSE_ST7567(bool dir) { dir ? SEND_CMD(0xC0) : SEND_CMD(0xC8); }
+void I2C_WAIT_TXE() {
+  while (!(I2C1->SR1 & I2C_SR1_TXE))
+    ;
+}
 
 /*-----------------------------------*/
-/* Set display horizontal direction. */
+/* Wait for receive buffer not empty */
 /*-----------------------------------*/
-/* false:display left to right, true:display right to left */
-void HREVERSE_ST7567(bool dir) {
-  dir ? SEND_CMD(0xA1) : SEND_CMD(0xA0);
-  HREVERSE_status = dir;
-}
-
-/*------------------------------------------------------*/
-/* Set negative display(true) or normal display(false). */
-/*------------------------------------------------------*/
-void INVERSE_ST7567(bool inverse) {
-  inverse ? SEND_CMD(0xA7)
-          : SEND_CMD(0xA6); // Inverse display or Normal display
+void I2C_WAIT_RXNE() {
+  while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    ;
 }
 
 /*---------------------------------*/
-/* Set reguration ratio (contrast) */
+/* Wait for byte transfer finished */
 /*---------------------------------*/
-/* RR value can set 0 to 7 */
-/* Reecomend value is 4 */
-void SETRR_ST7567(uint8_t RR) { SEND_CMD(0x20 + (RR & 0x7)); }
-
-/*------------------------------------*/
-/* Initialize ST7567 based LCD panel. */
-/*------------------------------------*/
-void INIT_ST7567() {
-  /* Reset the LCD */
-  HW_RESET_ST7567();
-  /* Soft reset the LCD */
-  // SW_RESET_ST7567();
-
-  /* Initialize the ST7567 LCD controller */
-  SW_ST7567(false); // Display OFF
-  SEND_CMD(0xA3);   // Set bias voltage
-  // DISPDIR_ST7567(true); // Set direction:Left to right
-  // DISPDIR_ST7567(true); // Set direction:Right to left
-  // SEND_CMD(0xA5); // ALLpixel ON
-  // SEND_CMD(0xA4); // ALLpixel ON
-  SEND_CMD(0x20); // Set voltage resistor ratio
-  // SEND_CMD(0x2F); // Power control set
-  SEND_CMD(0x2F); // Power control set
-  // SEND_CMD(0x40); // Set display start line
-  SW_ST7567(true); // Display ON
+void I2C_WAIT_BTF() {
+  while (!(I2C1->SR1 & I2C_SR1_BTF))
+    ;
 }
 
-/*--------------------------------------------*/
-/* Turn on or off the backlight of LCD panel. */
-/*--------------------------------------------*/
-/* Turn off(false) or turn on(true) the backlight. */
-void BACK_LIGHT(bool light_on) {
-  light_on ? GPIOA->BSRR = GPIO_BSRR_BR1 : GPIOA->BSRR = GPIO_BSRR_BS1;
-}
-
-/*--------------------------------------*/
-/* Set page(vertical position). (0...7) */
-/*--------------------------------------*/
-void SET_PAGE(uint8_t page) {
-  SEND_CMD(0xB0 | (page & 0x07)); // Set page address
-}
-
-/*--------------------------------------------*/
-/* Set column(horizontal position). (0...127) */
-/*--------------------------------------------*/
-void SET_COLUMN(uint8_t column) {
-  if (HREVERSE_status)
-    column += H_gap;
-  SEND_CMD(0x10 | ((column >> 4) & 0x0F)); // Set column address (high nibble)
-  SEND_CMD(0x00 | (column & 0x0F));        // Set column address (low nibble)
-}
-
-/*--------------------------------------------*/
-/* Set cursor position for put the character. */
-/*--------------------------------------------*/
-void SET_CURSOR(uint8_t page, uint8_t column) {
-  SET_PAGE(page);
-  SET_COLUMN(column);
-  NextPage = page;
-  NextCol = column;
-}
-
-/*-----------------------------------------------------*/
-/* Clear LCD screen and set cursor position to origin. */
-/*-----------------------------------------------------*/
-void CLEAR_SCREEN(void) {
-  for (uint8_t i = 0; i < 8; i++) {
-    SET_PAGE(i);
-    SET_COLUMN(0);
-    for (uint8_t j = 0; j < 128; j++) {
-      SEND_DATA(0); // Fill the page with data
-    }
-  }
-  NextPage = 0;
-  NextCol = 0;
+/*---------------------------------*/
+/* Wait for stop condition detected*/
+/*---------------------------------*/
+void I2C_WAIT_STOPF() {
+  while (!(I2C1->SR1 & I2C_SR1_STOPF))
+    ;
 }
 
 /*-------------------------*/
-/* Set magnifucation rate. */
+/* Wait for address sended */
 /*-------------------------*/
-/* V_mag as 1 to 8 */
-/* H_mag as 1 to 16 */
-void SET_MAG(uint8_t V_mag, uint8_t H_mag) {
-  CurV_mag = V_mag;
-  CurH_mag = H_mag;
+void I2C_WAIT_ADDR() {
+  while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    ;
+  (void)I2C1->SR2; // Clear ADDR flag by reading SR2
+}
+
+/*---------------------------------------*/
+/* Wait for clear the reply failure flag */
+/*---------------------------------------*/
+void I2C_WAIT_AF() {
+  while (I2C1->SR1 & I2C_SR1_AF)
+    ;
+}
+
+/*--------------------------*/
+/* Wait for get arbitration */
+/*--------------------------*/
+void I2C_WAIT_ARLO() {
+  while (I2C1->SR1 & I2C_SR1_ARLO)
+    ;
+}
+
+void I2C_WAIT_BERR() {
+  while (I2C1->SR1 & I2C_SR1_BERR)
+    ;
+}
+
+void I2C_SWRESET() {
+  I2C1->CR1 |= I2C_CR1_SWRST;  // Set software reset bit
+  I2C1->CR1 &= ~I2C_CR1_SWRST; // Clear software reset bit
 }
 
 /*---------------------------------------------*/
-/* Put a character on current cursor position. */
+/* Wait for OverLoad or UnderLoad flag cleared */
 /*---------------------------------------------*/
-/* Cursor position will be updated */
-void PUT_CHR(uint8_t chr) {
-  uint32_t work, ext_work;
-  uint16_t dot_pos, i, j, k;
-  uint8_t page, col, V_mag, H_mag;
-
-  page = NextPage;
-  col = NextCol;
-  V_mag = CurV_mag;
-  H_mag = CurH_mag;
-  chr -= 0x20; // Adjust character data offset
-  if (V_mag > 8)
-    V_mag = 8; // max V_mag=8
-  if (H_mag > 16)
-    H_mag = 16; // max H_mag=16
-  for (i = 0; i < 7; i++) {
-    work = 0;
-    ext_work = 0;
-    /* vertical magnifies */
-    for (j = 0; j < 8; j++) {
-      if ((font_chr[chr][i] & (1 << j))) {
-        dot_pos = j * V_mag;
-        for (k = 0; k < V_mag; k++) {
-          if ((dot_pos + k) < 32)
-            work |= 1 << (dot_pos + k);
-          else
-            ext_work |= 1 << (dot_pos - 32 + k);
-        }
-      }
-    }
-    /* display character */
-    for (j = 0; j < V_mag; j++) { // Vertical loop
-      SET_CURSOR(page + j, col + i * H_mag);
-      for (k = 0; k < H_mag; k++) { // Horizontal loop
-        if (j < 4)
-          SEND_DATA(work & 0xff);
-        else
-          SEND_DATA(ext_work & 0xff);
-      }
-      if (j < 4)
-        work = work >> 8;
-      else
-        ext_work = ext_work >> 8;
-    }
-  }
-  /* Make horizontal space(between character) */
-  for (j = 0; j < V_mag; j++) {
-    SET_CURSOR(page + j, col + i * H_mag);
-    for (k = 0; k < H_mag; k++)
-      SEND_DATA(0);
-  }
-  NextPage = page;
-  NextCol = col + (H_mag << 3);         // H_mag * 8
-  if (NextCol > (128 - (H_mag << 3))) { // H_mag * 8
-    NextCol = 0;
-    NextPage += V_mag;
-  }
-  /* next page will reset to 0 if next page will be 0 */
-  if (NextPage >= MAX_PAGE)
-    NextPage = 0;
-}
-
-/*------------------------------------------*/
-/* Put stringth on current cursor position. */
-/*------------------------------------------*/
-/* Cursor position will be updated */
-void PUT_STR(char str[]) {
-  int i = 0;
-  while (str[i]) {
-    PUT_CHR(str[i]);
-    i++;
-  }
+void I2C_WAIT_OVR() {
+  while (I2C1->SR1 & I2C_SR1_OVR)
+    ;
 }
 
 int main() {
@@ -570,18 +475,18 @@ int main() {
   INIT_USART();
   /* start SysTick */
   INIT_SysTick();
-  INIT_SPI();
-  INIT_ST7567();
-  CLEAR_SCREEN();
-  VREVERSE_ST7567(false);
-  HREVERSE_ST7567(false);
-  SETRR_ST7567(4);
+  INIT_I2C();
+  // INIT_ST7567();
+  //  CLEAR_SCREEN();
+  //  VREVERSE_ST7567(false);
+  //  HREVERSE_ST7567(false);
+  //  SETRR_ST7567(4);
 
   // PUT_CHR('A');
-  SET_CURSOR(3, 16);
-  SET_MAG(2, 1);
-  PUT_STR((char *)"Hello World!");
-  PUT_STR((char *)"**");
+  // SET_CURSOR(3, 16);
+  // SET_MAG(2, 1);
+  // PUT_STR((char *)"Hello World!");
+  // PUT_STR((char *)"**");
   // SET_CURSOR(4,0);
   // PUT_STR((char *)"abcdefghijklmnopqrstuvwxyz");
   // SET_MAG(8, 7);
@@ -590,12 +495,29 @@ int main() {
   // PUT_CHR('A');
   // PUT_CHR('S');
 
+  /* Turn on the debug LED*/
+  GPIOA->BSRR = GPIO_BSRR_BS1;
+
+  while (GPIOA->IDR & GPIO_IDR_ID0) {
+
+    I2C_START_CONDITION();
+    I2C_SEND_BYTE(0x55); // Send slave address with write bit
+    /* Turn off the debug LED*/
+    GPIOA->BSRR = GPIO_BSRR_BR1;
+    // I2C_WAIT_ACK();      // Wait for ACK from slave
+    I2C_STOP_CONDITION();
+
+    delay(1);
+  }
+
+  RESET_SWD();
+
   while (1) {
-    BACK_LIGHT(true);
-    INVERSE_ST7567(false);
-    delay(5000); // Wait for 1 second
-    INVERSE_ST7567(true);
-    delay(1000);
+    // BACK_LIGHT(true);
+    // INVERSE_ST7567(false);
+    // delay(5000); // Wait for 1 second
+    // INVERSE_ST7567(true);
+    // delay(1000);
     /* check overrun error abd clear overrun error */
     // while(USART1->SR & USART_SR_ORE) (void)USART1->DR;
     /* receive data from USART1 */
